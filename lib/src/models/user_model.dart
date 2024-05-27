@@ -1,5 +1,42 @@
 import 'package:flutter/material.dart';
 
+class SocialMediaModel {
+  final String id;
+  final String facebook;
+  final String twitter;
+  final String whatsApp;
+  final String snapshat;
+
+  SocialMediaModel(
+      {required this.id,
+      required this.facebook,
+      required this.twitter,
+      required this.whatsApp,
+      required this.snapshat});
+
+  // fromJson
+  factory SocialMediaModel.fromJson(Map<String, dynamic> json) {
+    return SocialMediaModel(
+      id: json['id'],
+      facebook: json['facebook'],
+      twitter: json['twitter'],
+      whatsApp: json['whatsApp'],
+      snapshat: json['snapshat'],
+    );
+  }
+
+  // toJson
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'facebook': facebook,
+      'twitter': twitter,
+      'whatsApp': whatsApp,
+      'snapshat': snapshat,
+    };
+  }
+}
+
 class UserModel {
   final String id;
   final DateTime joinedDate;
@@ -27,6 +64,9 @@ class UserModel {
       required this.email,
       required this.imageUrl,
       required this.country});
+
+// subcollection socialMedia
+// subcollection notifications
 
   // fromJson
   factory UserModel.fromJson(Map<String, dynamic> json) {

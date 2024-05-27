@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "787461992992",
+    "project_id": "balaagh-mob-web",
+    "storage_bucket": "balaagh-mob-web.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:787461992992:android:6acd54a60f1a138c2e4245",
+        "android_client_info": {
+          "package_name": "com.balaagh.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDA68UIRxhnjnyfClEqaWpOwTQbhlbP1d0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
