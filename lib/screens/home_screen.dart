@@ -52,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 Text(
                   "id: xxxx,xxxx,xxxx,xxxx",
-                  style: Theme.of(context).textTheme.bodySmall,
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
             )
