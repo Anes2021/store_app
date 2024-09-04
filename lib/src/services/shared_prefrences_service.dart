@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:balagh/src/models/user_model.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart'; 
+import 'package:shared_preferences/shared_preferences.dart';
 
 // todo : you can only have a single account in each device and when deletes the account the boolean get reversed
 class SharedPrefrencesController {
@@ -27,8 +27,6 @@ class SharedPrefrencesController {
   static const String _userModelKey = "userModel";
 
   //*---------------------------------------------------------------------------*//
-
- 
 
   // write userModel
   Future<bool> writeUserModel(UserModel userModel) async {

@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "787461992992",
-    "project_id": "balaagh-mob-web",
-    "storage_bucket": "balaagh-mob-web.appspot.com"
+    "project_number": "157230524967",
+    "project_id": "store-app-anes2021",
+    "storage_bucket": "store-app-anes2021.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:787461992992:android:6acd54a60f1a138c2e4245",
+        "mobilesdk_app_id": "1:157230524967:android:441e4a8f98d141417afc02",
         "android_client_info": {
-          "package_name": "com.balaagh.app"
+          "package_name": "com.example.balagh"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDA68UIRxhnjnyfClEqaWpOwTQbhlbP1d0"
+          "current_key": "AIzaSyAi9C5tkjwJbvH5gEkB-8IgtfY4i81tJ4U"
         }
       ],
       "services": {
