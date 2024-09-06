@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 // import 'package:fluttertoast/fluttertoast.dart';
 
 extension StringExtension on String {
@@ -154,5 +155,44 @@ extension FucusOff on BuildContext {
 extension OrientationExtension on BuildContext {
   Orientation get orientation {
     return MediaQuery.of(this).orientation;
+  }
+}
+
+extension SetDarkStatus on BuildContext {
+  void setLightStatus() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
+      SystemUiOverlay.top,
+      // SystemUiOverlay.bottom,
+    ]);
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+      statusBarBrightness: Brightness.light,
+      systemNavigationBarColor: Colors.black,
+      systemNavigationBarIconBrightness: Brightness.light,
+      systemNavigationBarDividerColor: Colors.black,
+    ));
+    SystemChrome.setSystemUIChangeCallback((systemOverlaysAreVisible) async {
+      await Future.delayed(const Duration(seconds: 1));
+      SystemChrome.restoreSystemUIOverlays();
+    });
+  }
+
+  void setDarkStatus() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
+      SystemUiOverlay.top,
+    ]);
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.dark,
+      systemNavigationBarColor: Colors.white,
+      systemNavigationBarIconBrightness: Brightness.dark,
+      systemNavigationBarDividerColor: Colors.white,
+    ));
+    SystemChrome.setSystemUIChangeCallback((systemOverlaysAreVisible) async {
+      await Future.delayed(const Duration(seconds: 1));
+      SystemChrome.restoreSystemUIOverlays();
+    });
   }
 }
