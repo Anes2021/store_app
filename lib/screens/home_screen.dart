@@ -1,8 +1,10 @@
+import 'package:balagh/screens/admin/create_item_shop_screen.dart';
 import 'package:balagh/src/core/app_color.dart';
-import 'package:balagh/src/core/app_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+
+import '../src/presentation/widgets.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,6 +14,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  TextEditingController searchController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,16 +39,24 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.only(right: 10, left: 10, bottom: 10),
       child: Row(
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: AppColors.backgroundColorGrey01,
-                width: 1.5,
+          GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                    builder: (context) => const CreateItemShopScreen()),
+              );
+            },
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: AppColors.backgroundColorGrey01,
+                  width: 1.5,
+                ),
+                borderRadius: BorderRadius.circular(10),
+                color: AppColors.backgroundColorOne,
               ),
-              borderRadius: BorderRadius.circular(10),
-              color: AppColors.backgroundColorOne,
             ),
           ),
           const SizedBox(width: 10),
@@ -112,39 +123,9 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.only(right: 10, left: 10, bottom: 5),
       child: Column(
         children: [
-          TextField(
-            decoration: InputDecoration(
-              hintText: 'Find what you need',
-              prefixIcon: const Icon(Icons.search,
-                  color: AppColors.backgroundColorGrey01),
-              suffixIcon: const Icon(Icons.tune,
-                  color: AppColors.backgroundColorGrey01),
-              hintStyle: Theme.of(context)
-                  .textTheme
-                  .labelMedium
-                  ?.copyWith(color: AppColors.backgroundColorGrey01),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(
-                    color: AppColors.backgroundColorGrey01, width: 1.5),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(
-                    color: AppColors.backgroundColorGrey01, width: 1.5),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: Colors.orange, width: 1.5),
-              ),
-              filled: true,
-              fillColor: AppColors.backgroundColorGrey03,
-              contentPadding: const EdgeInsets.symmetric(vertical: 15.0),
-            ),
-            style: Theme.of(context)
-                .textTheme
-                .labelMedium
-                ?.copyWith(color: AppColors.backgroundColorGrey02),
+          TextFieldSearchModel(
+            controller: searchController,
+            hintText: "Find What's you Need",
           ),
           const SizedBox(height: 5),
           Row(
@@ -212,7 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Stack(
       children: [
         Container(
-          width: (context.width - 20.w - 10.w) / 2,
+          width: (MediaQuery.of(context).size.width - 20.w - 10.w) / 2,
           decoration: BoxDecoration(
             border:
                 Border.all(color: AppColors.backgroundColorGrey01, width: 1),
@@ -223,7 +204,7 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: context.width,
+                width: MediaQuery.of(context).size.width,
                 height: 140.h,
                 decoration: BoxDecoration(
                     color: Colors.white,
@@ -233,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 5.w),
                 child: Container(
-                  width: context.width,
+                  width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
                       color: AppColors.backgroundColorGrey03,
                       borderRadius: BorderRadius.circular(10)),

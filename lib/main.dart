@@ -1,14 +1,15 @@
 import 'package:balagh/screens/home_screen.dart';
 import 'package:balagh/src/core/app_color.dart';
-import 'package:balagh/src/injection_container.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  setUp();
+
+  await Firebase.initializeApp();
+  // setUp();
   runApp(const Distributor());
 }
 
@@ -27,6 +28,13 @@ class _DistributorState extends State<Distributor> {
       builder: (context, child) => MaterialApp(
         theme: ThemeData(
           textTheme: TextTheme(
+            bodyLarge: GoogleFonts.aBeeZee(
+              textStyle: TextStyle(
+                fontSize: 20.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.orange,
+              ),
+            ),
             bodyMedium: GoogleFonts.aBeeZee(
               textStyle: TextStyle(
                 fontSize: 16.sp,
