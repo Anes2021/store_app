@@ -1,18 +1,24 @@
 import 'package:balagh/src/core/app_color.dart';
+import 'package:firebase_cloud_firestore/firebase_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class TextFieldModel extends StatelessWidget {
-  const TextFieldModel(
-      {super.key,
-      required this.controller,
-      required this.hintText,
-      this.keyboardType,
-      this.enabled,
-      required this.function,
-      this.colors});
+  const TextFieldModel({
+    super.key,
+    required this.controller,
+    required this.hintText,
+    this.keyboardType,
+    this.enabled,
+    required this.function,
+    this.colors,
+    this.textFieldHeight,
+    this.maxLines,
+  });
+  final int? maxLines;
   final TextInputType? keyboardType;
   final Function(String text) function;
   final bool? enabled;
+  final int? textFieldHeight;
   final TextEditingController controller;
   final String hintText;
   final Color? colors;
@@ -20,8 +26,13 @@ class TextFieldModel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextField(
-      onChanged: (String text) {
-        function(text);
+      maxLines: maxLines ?? 1,
+      onChanged: (
+        String text,
+      ) {
+        function(
+          text,
+        );
       },
       keyboardType: keyboardType,
       enabled: enabled ?? true,
@@ -53,8 +64,8 @@ class TextFieldModel extends StatelessWidget {
         ),
         filled: true,
         fillColor: AppColors.backgroundColorGrey03,
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10),
+        contentPadding: EdgeInsets.symmetric(
+            vertical: (textFieldHeight ?? 15).asDouble(), horizontal: 10),
       ),
       style: Theme.of(context)
           .textTheme

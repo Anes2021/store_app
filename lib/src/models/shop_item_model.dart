@@ -6,11 +6,10 @@ class ShopItemModel {
   final String category;
   final String? imageUrl;
   final int price;
-  final int oldPrice;
+  final int priceAfterDiscount;
   final int views;
   final int likes;
   final bool discount;
-  final bool isLiked;
 
   ShopItemModel({
     required this.category,
@@ -20,11 +19,10 @@ class ShopItemModel {
     required this.description,
     required this.imageUrl,
     required this.price,
-    this.oldPrice = 0,
+    this.priceAfterDiscount = 0,
     this.views = 0,
     this.likes = 0,
     this.discount = false,
-    this.isLiked = false,
   });
 
   Map<String, dynamic> toJson() {
@@ -36,11 +34,10 @@ class ShopItemModel {
       'description': description,
       'imageUrl': imageUrl,
       'price': price,
-      'oldPrice': oldPrice,
+      'priceAfterDiscount': priceAfterDiscount,
       'views': views,
       'likes': likes,
       'discount': discount,
-      'isLiked': isLiked,
     };
   }
 
@@ -54,11 +51,10 @@ class ShopItemModel {
       description: json['description'],
       imageUrl: json['imageUrl'] ?? "",
       price: json['price'],
-      oldPrice: json['oldPrice'] ?? 0,
+      priceAfterDiscount: json['priceAfterDiscount'] ?? 0,
       views: json['views'] ?? 0,
       likes: json['likes'] ?? 0,
       discount: json['discount'] ?? false,
-      isLiked: json['isLiked'] ?? false,
     );
   }
 }
