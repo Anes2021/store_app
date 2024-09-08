@@ -1,5 +1,3 @@
-// ignore_for_file: dead_code, use_build_context_synchronously
-
 import 'dart:developer';
 
 import 'package:balagh/src/core/app_color.dart';
@@ -35,8 +33,8 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
   String? priceSelectedTile;
   String? categorySelectedTile;
   bool isDiscounted = false;
-
   double? discountPercantage;
+
   @override
   void initState() {
     priceSelectedTile = priceTiles[0];
@@ -48,38 +46,43 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(10.h),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Gap(30.h),
-              appBar(),
-              Gap(20.h),
-              imagePickUpContainer(),
-              Gap(10.h),
-              textFields(),
-              Gap(10.h),
-              priceZone(),
-              Gap(10.h),
-              GestureDetector(
-                onTap: () async {
-                  await createItemShop();
-                },
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                      color: Colors.orange,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                          color: AppColors.backgroundColorGrey01, width: 2)),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    child: Center(child: Text("Create Item Shop")),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: MediaQuery.of(context).size.height, // Ensure full height
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(10.h),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Gap(30.h),
+                appBar(),
+                Gap(20.h),
+                imagePickUpContainer(),
+                Gap(10.h),
+                textFields(),
+                Gap(10.h),
+                priceZone(),
+                Gap(10.h),
+                GestureDetector(
+                  onTap: () async {
+                    await createItemShop();
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                        color: Colors.orange,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                            color: AppColors.backgroundColorGrey01, width: 2)),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 15),
+                      child: Center(child: Text("Create Item Shop")),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -111,81 +114,74 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
               Gap(5.h),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 5.w),
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                      color: AppColors.backgroundColorGrey03,
-                      borderRadius: BorderRadius.circular(10)),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(color: AppColors.backgroundColorGrey02),
+                    ),
+                    Gap(3.h),
+                    Text(
+                      description,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 3,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleSmall
+                          ?.copyWith(color: AppColors.backgroundColorGrey01),
+                    ),
+                    Gap(5.h),
+                    if (discount)
                       Text(
-                        title,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium
-                            ?.copyWith(color: AppColors.backgroundColorGrey02),
-                      ),
-                      Gap(3.h),
-                      Text(
-                        description,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 3,
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleSmall
-                            ?.copyWith(color: AppColors.backgroundColorGrey01),
-                      ),
-                      Gap(5.h),
-                      discount
-                          ? Text(
-                              "$price\$",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge
-                                  ?.copyWith(
-                                    color: Colors.red[800],
-                                    fontSize: 13.sp,
-                                    decoration: TextDecoration.lineThrough,
-                                    decorationColor: Colors.red[800],
-                                    decorationThickness: 1.0,
-                                  ),
-                            )
-                          : Gap(17.h),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              (discount) ? ("$afterPrice\$") : ("$price\$"),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge
-                                  ?.copyWith(
-                                      color: AppColors.backgroundColorGrey02),
+                        "$price\$",
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              color: Colors.red[800],
+                              fontSize: 13.sp,
+                              decoration: TextDecoration.lineThrough,
+                              decorationColor: Colors.red[800],
+                              decorationThickness: 1.0,
                             ),
+                      )
+                    else
+                      Gap(17.h),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            discount ? "$afterPrice\$" : "$price\$",
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(
+                                    color: AppColors.backgroundColorGrey02),
                           ),
-                          Text(
-                            '(0.0)',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                          Icon(
-                            Icons.star_rate,
-                            color: Colors.orange,
-                            size: 27.sp,
-                          )
-                        ],
-                      ),
-                      Gap(10.h),
-                      Row(
-                        children: [
-                          Expanded(
-                              child: Container(
+                        ),
+                        Text(
+                          '(0.0)',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                        Icon(
+                          Icons.star_rate,
+                          color: Colors.orange,
+                          size: 27.sp,
+                        )
+                      ],
+                    ),
+                    Gap(10.h),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
                             height: 30.h,
                             decoration: BoxDecoration(
                                 color: Colors.transparent,
@@ -199,10 +195,11 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
                                 color: Colors.orange,
                               ),
                             ),
-                          )),
-                          Gap(5.w),
-                          Expanded(
-                              child: Container(
+                          ),
+                        ),
+                        Gap(5.w),
+                        Expanded(
+                          child: Container(
                             height: 30.h,
                             decoration: BoxDecoration(
                                 color: Colors.orange,
@@ -214,12 +211,12 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
                                 color: AppColors.backgroundColorGrey03,
                               ),
                             ),
-                          )),
-                        ],
-                      ),
-                      Gap(6.h)
-                    ],
-                  ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Gap(6.h)
+                  ],
                 ),
               ),
             ],
@@ -246,27 +243,28 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
     return Row(
       children: [
         GestureDetector(
-            onTap: () {
-              Navigator.of(context).pop();
-            },
-            child: Container(
-              width: 40.w,
-              height: 40.h,
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: AppColors.backgroundColorGrey01,
-                  width: 1.5.sp,
-                ),
-                borderRadius: BorderRadius.circular(10.sp),
-                color: AppColors.backgroundColorOne,
+          onTap: () {
+            Navigator.of(context).pop();
+          },
+          child: Container(
+            width: 40.w,
+            height: 40.h,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: AppColors.backgroundColorGrey01,
+                width: 1.5.sp,
               ),
-              child: const Center(
-                child: Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: Colors.orange,
-                ),
+              borderRadius: BorderRadius.circular(10.sp),
+              color: AppColors.backgroundColorOne,
+            ),
+            child: const Center(
+              child: Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: Colors.orange,
               ),
-            )),
+            ),
+          ),
+        ),
         Gap(10.w),
         Text(
           "Create Item in Shop",
@@ -303,21 +301,24 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
   }
 
   Widget textFields() {
-    return Column(children: [
-      TextFieldModel(
-        controller: titleController,
-        hintText: "put title here",
-        function: (String text) {},
-      ),
-      Gap(10.h),
-      TextFieldModel(
-        maxLines: 3,
-        textFieldHeight: 30,
-        controller: descriptionController,
-        hintText: "put description here",
-        function: (String text) {},
-      ),
-    ]);
+    return Column(
+      children: [
+        TextFieldModel(
+          controller: titleController,
+          hintText: "put title here",
+          function: (String text) {},
+        ),
+        Gap(10.h),
+        TextFieldModel(
+          maxLines: 3,
+          minLines: 3,
+          textFieldHeight: 15,
+          controller: descriptionController,
+          hintText: "put description here",
+          function: (String text) {},
+        ),
+      ],
+    );
   }
 
   Widget priceZone() {
@@ -335,10 +336,11 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
             ),
             Gap(5.w),
             Expanded(
-                child: Container(
-              height: 1.h,
-              color: AppColors.backgroundColorGrey02,
-            )),
+              child: Container(
+                height: 1.h,
+                color: AppColors.backgroundColorGrey02,
+              ),
+            ),
           ],
         ),
         Gap(10.w),
@@ -360,17 +362,15 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
                 decoration: BoxDecoration(
                   color: AppColors.backgroundColorGrey03,
                   border: Border.all(
-                    color: AppColors.backgroundColorGrey01, // Border color
-                    width: 1.5, // Border width
+                    color: AppColors.backgroundColorGrey01,
+                    width: 1.5,
                   ),
-
-                  borderRadius:
-                      BorderRadius.circular(10.0), // Adds rounded corners
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         "discount:",
@@ -379,29 +379,27 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
                             .labelMedium
                             ?.copyWith(color: AppColors.backgroundColorGrey01),
                       ),
-                      Expanded(
-                        child: ListTile(
-                          minTileHeight: 49,
-                          trailing: DropdownButton<String>(
-                            value: priceSelectedTile,
-                            items: priceTiles
-                                .map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(
-                                  value,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .labelMedium
-                                      ?.copyWith(color: Colors.orange),
-                                ),
-                              );
-                            }).toList(),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                if (priceController.text.trim().isEmpty) {
-                                  CherryToast.error(
-                                      description: Text(
+                      SizedBox(
+                        child: DropdownButton<String>(
+                          value: priceSelectedTile,
+                          items: priceTiles
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(
+                                value,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelMedium
+                                    ?.copyWith(color: Colors.orange),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              if (priceController.text.trim().isEmpty) {
+                                CherryToast.error(
+                                  description: Text(
                                     "please add price first then add a discount to it",
                                     style: Theme.of(context)
                                         .textTheme
@@ -410,15 +408,18 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
                                             fontSize: 13.sp,
                                             color: AppColors
                                                 .backgroundColorGrey03),
-                                  )).show(context);
-                                  priceSelectedTile == priceTiles[0];
-                                  isDiscounted = false;
-                                  return;
-                                } else if (int.tryParse(priceController.text)! <
-                                    0) {
-                                  priceController.text = "";
-                                  CherryToast.error(
-                                      description: Text(
+                                  ),
+                                ).show(context);
+                                priceSelectedTile == priceTiles[0];
+                                isDiscounted = false;
+                                return;
+                              } else if (int.tryParse(
+                                    priceController.text,
+                                  )! <
+                                  0) {
+                                priceController.text = "";
+                                CherryToast.error(
+                                  description: Text(
                                     "please add price greater than 00",
                                     style: Theme.of(context)
                                         .textTheme
@@ -427,25 +428,22 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
                                             fontSize: 13.sp,
                                             color: AppColors
                                                 .backgroundColorGrey03),
-                                  )).show(context);
-                                  priceSelectedTile == priceTiles[0];
-                                  isDiscounted = false;
-                                  return;
-                                } else {
-                                  priceSelectedTile = newValue;
-                                  if (priceSelectedTile == priceTiles[0]) {
-                                    isDiscounted = false;
-                                  } else {
-                                    isDiscounted = true;
-                                  }
-                                }
+                                  ),
+                                ).show(context);
+                                priceSelectedTile == priceTiles[0];
+                                isDiscounted = false;
+                                return;
+                              } else {
+                                priceSelectedTile = newValue;
+                                isDiscounted =
+                                    priceSelectedTile != priceTiles[0];
+                              }
 
-                                log(isDiscounted.toString());
-                              });
-                            },
-                            underline: Container(),
-                            iconSize: 0,
-                          ),
+                              log(isDiscounted.toString());
+                            });
+                          },
+                          underline: Container(),
+                          iconSize: 0,
                         ),
                       ),
                     ],
@@ -465,24 +463,25 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
                       controller: oldpriceController,
                       hintText: "Price After Discounting",
                       function: (String newPrice) {
-                        // int newprice = int.tryParse(newPrice)!;
-                        int price = int.tryParse(priceController.text)!;
-                        int? newPrice =
-                            (int.tryParse(oldpriceController.text) ?? 0);
-                        if (newPrice > price || newPrice < 0) {
+                        int price = int.tryParse(priceController.text) ?? 0;
+                        int? newPriceVal =
+                            int.tryParse(oldpriceController.text);
+                        if (newPriceVal != null &&
+                            (newPriceVal > price || newPriceVal < 0)) {
                           CherryToast.error(
-                              description: Text(
-                            "new price need be smaller than $price and bigger than 00",
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(
-                                    fontSize: 13.sp,
-                                    color: AppColors.backgroundColorGrey03),
-                          )).show(context);
+                            description: Text(
+                              "new price needs to be smaller than $price and greater than 0",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                      fontSize: 13.sp,
+                                      color: AppColors.backgroundColorGrey03),
+                            ),
+                          ).show(context);
                         } else {
                           discountPercantage =
-                              (((price - newPrice) / price) * (100))
+                              (((price - (newPriceVal ?? 0)) / price) * 100)
                                   .roundToDouble();
                           log(discountPercantage.toString());
                           setState(() {});
@@ -504,9 +503,7 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
                   ),
                 ],
               )
-            : Container(
-                height: 0.h,
-              ),
+            : Container(),
         Gap(5.h),
         Row(
           children: [
@@ -519,10 +516,11 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
             ),
             Gap(5.w),
             Expanded(
-                child: Container(
-              height: 1.h,
-              color: AppColors.backgroundColorGrey02,
-            )),
+              child: Container(
+                height: 1.h,
+                color: AppColors.backgroundColorGrey02,
+              ),
+            ),
           ],
         ),
         Gap(10.h),
@@ -533,12 +531,10 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
                 decoration: BoxDecoration(
                   color: AppColors.backgroundColorGrey03,
                   border: Border.all(
-                    color: AppColors.backgroundColorGrey01, // Border color
-                    width: 1.5, // Border width
+                    color: AppColors.backgroundColorGrey01,
+                    width: 1.5,
                   ),
-
-                  borderRadius:
-                      BorderRadius.circular(10.0), // Adds rounded corners
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -575,15 +571,17 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
                                 categorySelectedTile = newValue;
                               });
                               CherryToast.info(
-                                  description: Text(
-                                "product category changed to $newValue",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.copyWith(
-                                        fontSize: 13.sp,
-                                        color: AppColors.backgroundColorGrey03),
-                              )).show(context);
+                                description: Text(
+                                  "product category changed to $newValue",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(
+                                          fontSize: 13.sp,
+                                          color:
+                                              AppColors.backgroundColorGrey03),
+                                ),
+                              ).show(context);
                             },
                             underline: Container(),
                             iconSize: 0,
@@ -609,10 +607,11 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
             ),
             Gap(5.w),
             Expanded(
-                child: Container(
-              height: 1.h,
-              color: AppColors.backgroundColorGrey02,
-            )),
+              child: Container(
+                height: 1.h,
+                color: AppColors.backgroundColorGrey02,
+              ),
+            ),
           ],
         ),
         Gap(10.h),
@@ -621,25 +620,29 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
           children: [
             Container(
               decoration: BoxDecoration(
-                  color: AppColors.backgroundColorGrey03,
-                  borderRadius: BorderRadius.circular(10.sp),
-                  border: Border.all(
-                      color: AppColors.backgroundColorGrey01, width: 1.5.sp)),
+                color: AppColors.backgroundColorGrey03,
+                borderRadius: BorderRadius.circular(10.sp),
+                border: Border.all(
+                  color: AppColors.backgroundColorGrey01,
+                  width: 1.5.sp,
+                ),
+              ),
               child: Column(
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: newProductsItem(
-                        (titleController.text.trim().isEmpty)
-                            ? "Product Title Here"
-                            : (titleController.text),
-                        (descriptionController.text.trim().isEmpty)
-                            ? "Product Descrition Here"
-                            : (descriptionController.text),
-                        int.tryParse(priceController.text) ?? 0,
-                        isDiscounted,
-                        int.tryParse(oldpriceController.text) ?? 0,
-                        true),
+                      (titleController.text.trim().isEmpty)
+                          ? "Product Title Here"
+                          : (titleController.text),
+                      (descriptionController.text.trim().isEmpty)
+                          ? "Product Description Here"
+                          : (descriptionController.text),
+                      int.tryParse(priceController.text) ?? 0,
+                      isDiscounted,
+                      int.tryParse(oldpriceController.text) ?? 0,
+                      true,
+                    ),
                   ),
                 ],
               ),
@@ -652,30 +655,31 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
 
   void cherrytoast(String text) {
     CherryToast.error(
-        description: Text(
-      text,
-      style: Theme.of(context)
-          .textTheme
-          .bodyMedium
-          ?.copyWith(fontSize: 13.sp, color: AppColors.backgroundColorGrey03),
-    )).show(context);
+      description: Text(
+        text,
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontSize: 13.sp,
+              color: AppColors.backgroundColorGrey03,
+            ),
+      ),
+    ).show(context);
   }
 
   Future<void> createItemShop() async {
     FirebaseFirestore fireStore = FirebaseFirestore.instance;
     String id = const Uuid().v4();
 
-    if (titleController.text.trim().isEmpty &&
-        descriptionController.text.trim().isEmpty &&
-        priceController.text.trim().isEmpty) {
+    if (titleController.text.trim().isEmpty ||
+        descriptionController.text.trim().isEmpty ||
+        priceController.text.trim().isEmpty ||
+        int.tryParse(priceController.text) == null) {
       CherryToast.error(
-          description: Text(
-        "please fill all informations",
-        style: Theme.of(context)
-            .textTheme
-            .bodyMedium
-            ?.copyWith(fontSize: 13.sp, color: AppColors.backgroundColorGrey03),
-      )).show(context);
+        description: Text(
+          "please fill all informations",
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontSize: 13.sp, color: AppColors.backgroundColorGrey03),
+        ),
+      ).show(context);
       return;
     } else {
       ShopItemModel shopItemModel = ShopItemModel(
@@ -684,25 +688,27 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
         title: titleController.text,
         description: descriptionController.text,
         imageUrl: '',
-        price: int.tryParse(priceController.text)!,
+        price: int.tryParse(priceController.text) ?? 0, // Handle null safely
         discount: isDiscounted,
         likes: 0,
         priceAfterDiscount: int.tryParse(oldpriceController.text) ?? 0,
         views: 0,
-        category: categorySelectedTile!,
+        category: categorySelectedTile ?? 'Unknown', // Fallback for null safety
       );
       await fireStore
           .collection("items_shop")
           .doc(id)
           .set(shopItemModel.toJson());
       CherryToast.success(
-          description: Text(
-        "product added successfully",
-        style: Theme.of(context)
-            .textTheme
-            .bodyMedium
-            ?.copyWith(fontSize: 13.sp, color: AppColors.backgroundColorGrey03),
-      )).show(context);
+        description: Text(
+          "product added successfully",
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontSize: 13.sp,
+                color: AppColors.backgroundColorGrey03,
+              ),
+        ),
+      ).show(context);
+      Navigator.of(context).pop();
     }
   }
 }

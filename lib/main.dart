@@ -35,6 +35,7 @@ class _DistributorState extends State<Distributor> {
                 color: Colors.orange,
               ),
             ),
+            //! this will change to black in light mode
             bodyMedium: GoogleFonts.aBeeZee(
               textStyle: TextStyle(
                 fontSize: 16.sp,

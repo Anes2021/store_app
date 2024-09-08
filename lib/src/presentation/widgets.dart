@@ -13,8 +13,10 @@ class TextFieldModel extends StatelessWidget {
     this.colors,
     this.textFieldHeight,
     this.maxLines,
+    this.minLines,
   });
   final int? maxLines;
+  final int? minLines;
   final TextInputType? keyboardType;
   final Function(String text) function;
   final bool? enabled;
@@ -27,6 +29,7 @@ class TextFieldModel extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextField(
       maxLines: maxLines ?? 1,
+      minLines: minLines ?? 1,
       onChanged: (
         String text,
       ) {
