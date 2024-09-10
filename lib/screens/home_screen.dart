@@ -1,5 +1,6 @@
 import 'package:balagh/screens/admin/create_item_shop_screen.dart';
 import 'package:balagh/screens/item_shop_screen.dart';
+import 'package:balagh/screens/profile_screen.dart';
 import 'package:balagh/src/core/app_color.dart';
 import 'package:balagh/src/models/shop_item_model.dart';
 import 'package:firebase_cloud_firestore/firebase_cloud_firestore.dart';
@@ -21,6 +22,14 @@ class _HomeScreenState extends State<HomeScreen> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   late List<ShopItemModel> listOfItemsNEW = [];
   bool isItemLoading = true;
+
+  int currentIndex = 0;
+
+  final List<Widget> screens = [
+    const CreateItemShopScreen(),
+    const ProfileScreen(),
+  ];
+
   @override
   void initState() {
     initPage();
@@ -45,19 +54,29 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Gap(40.h),
-            _buildAppBar(),
-            _buildSearchBar(),
-            _buildCategoryList(),
-            _buildNewProducts(),
-            // _buildBestSellers()
-          ],
-        ),
+      body: IndexedStack(
+        index: currentIndex,
+        children: [
+          _buildHomeScreenContent(),
+          ...screens, // Add other screens from the list
+        ],
       ),
       bottomNavigationBar: _buildBottomNavigationBar(),
+    );
+  }
+
+  // Move the original content of HomeScreen to a separate method
+  Widget _buildHomeScreenContent() {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Gap(40.h),
+          _buildAppBar(),
+          _buildSearchBar(),
+          _buildCategoryList(),
+          _buildNewProducts(),
+        ],
+      ),
     );
   }
 
@@ -229,6 +248,7 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           child: Container(
             width: (MediaQuery.of(context).size.width - 20.w - 10.w) / 2,
+            height: 310.h,
             decoration: BoxDecoration(
               border:
                   Border.all(color: AppColors.backgroundColorGrey01, width: 1),
@@ -281,6 +301,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         discount
                             ? Text(
                                 "$price£",
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
                                 style: Theme.of(context)
                                     .textTheme
                                     .titleLarge
@@ -296,15 +318,18 @@ class _HomeScreenState extends State<HomeScreen> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text(
-                              "$price£",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge
-                                  ?.copyWith(
-                                      color: AppColors.backgroundColorGrey02),
+                            Expanded(
+                              child: Text(
+                                "$price£",
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.copyWith(
+                                        color: AppColors.backgroundColorGrey02),
+                              ),
                             ),
-                            const Spacer(),
                             Text(
                               '(4.5)',
                               style: Theme.of(context).textTheme.bodySmall,
@@ -375,20 +400,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         )
       ],
-    );
-  }
-
-  Widget newProductsItemLoading() {
-    return Container(
-      width: (MediaQuery.of(context).size.width - 20.w - 10.w) / 2,
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColors.backgroundColorGrey01, width: 1),
-        color: AppColors.backgroundColorGrey03,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: const CircularProgressIndicator(
-        color: Colors.orange,
-      ),
     );
   }
 
@@ -466,7 +477,12 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Colors.grey[900],
       selectedItemColor: Colors.orange,
       unselectedItemColor: Colors.grey,
-      currentIndex: 0,
+      currentIndex: currentIndex,
+      onTap: (int index) {
+        setState(() {
+          currentIndex = index;
+        });
+      },
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
