@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 
-class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+class CartScreen extends StatefulWidget {
+  const CartScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  State<CartScreen> createState() => _CartScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,18 +18,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           children: [
             appBar(),
-            Gap(20.h),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: Container(
-                width: double.infinity.w,
-                height: 125,
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.orange, width: 1),
-                    borderRadius: BorderRadius.circular(10),
-                    color: AppColors.backgroundColorTwo),
-              ),
-            )
           ],
         ),
       ),
@@ -61,7 +49,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "Profile Settings",
+                  "My Cart",
                   style: Theme.of(context)
                       .textTheme
                       .bodyLarge

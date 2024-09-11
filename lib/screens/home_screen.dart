@@ -1,4 +1,5 @@
 import 'package:balagh/screens/admin/create_item_shop_screen.dart';
+import 'package:balagh/screens/cart_screen.dart';
 import 'package:balagh/screens/item_shop_screen.dart';
 import 'package:balagh/screens/profile_screen.dart';
 import 'package:balagh/src/core/app_color.dart';
@@ -26,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int currentIndex = 0;
 
   final List<Widget> screens = [
-    const CreateItemShopScreen(),
+    const CartScreen(),
     const ProfileScreen(),
   ];
 
@@ -485,12 +486,12 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       items: const [
         BottomNavigationBarItem(
-          icon: Icon(Icons.home),
+          icon: Icon(Icons.home_outlined),
           label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.favorite_outline),
-          label: 'Favorites',
+          icon: Icon(Icons.shopping_cart_outlined),
+          label: 'Cart',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.person_outline),
