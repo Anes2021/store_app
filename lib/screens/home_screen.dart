@@ -1,13 +1,17 @@
 import 'package:balagh/screens/admin/create_item_shop_screen.dart';
 import 'package:balagh/screens/cart_screen.dart';
+import 'package:balagh/screens/categories_screen.dart';
 import 'package:balagh/screens/item_shop_screen.dart';
+import 'package:balagh/screens/orders_screen.dart';
 import 'package:balagh/screens/profile_screen.dart';
 import 'package:balagh/src/core/app_color.dart';
 import 'package:balagh/src/models/shop_item_model.dart';
 import 'package:firebase_cloud_firestore/firebase_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart'; // Import persistent_bottom_nav_bar
 
 import '../src/presentation/widgets.dart';
 
@@ -24,10 +28,14 @@ class _HomeScreenState extends State<HomeScreen> {
   late List<ShopItemModel> listOfItemsNEW = [];
   bool isItemLoading = true;
 
-  int currentIndex = 0;
+  // PersistentTabController for controlling the bottom navigation bar
+  final PersistentTabController _controller =
+      PersistentTabController(initialIndex: 0);
 
+  // Add CartScreen and OrdersScreen to the list of screens
   final List<Widget> screens = [
     const CartScreen(),
+    const OrdersScreen(),
     const ProfileScreen(),
   ];
 
@@ -55,28 +63,93 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: currentIndex,
-        children: [
-          _buildHomeScreenContent(),
-          ...screens, // Add other screens from the list
-        ],
+      body: PersistentTabView(
+        context,
+        controller: _controller,
+        screens: _buildScreens(),
+        items: _navBarsItems(),
+        confineToSafeArea: true,
+        navBarHeight: 60,
+        backgroundColor:
+            AppColors.backgroundColorTwo, // Nav bar background color
+        handleAndroidBackButtonPress: true,
+        resizeToAvoidBottomInset: true,
+        stateManagement: true,
+        hideNavigationBarWhenKeyboardAppears: true,
+        decoration: const NavBarDecoration(
+          colorBehindNavBar: AppColors.backgroundColorOne,
+        ),
+        popBehaviorOnSelectedNavBarItemPress: PopBehavior.all,
+        navBarStyle: NavBarStyle.style3, // Choose nav bar style
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(),
     );
+  }
+
+  // Build the screens for the bottom navigation bar
+  List<Widget> _buildScreens() {
+    return [
+      _buildHomeScreenContent(), // Home screen content
+      const OrdersScreen(),
+      const CartScreen(),
+      const CategoriesScreen(),
+      const ProfileScreen(),
+    ];
+  }
+
+  // Build the bottom navigation items
+  List<PersistentBottomNavBarItem> _navBarsItems() {
+    return [
+      PersistentBottomNavBarItem(
+        icon: const Icon(Icons.home),
+        title: ("Home"),
+        activeColorPrimary: Colors.orange,
+        inactiveColorPrimary: Colors.grey,
+      ),
+      PersistentBottomNavBarItem(
+        icon: const Icon(FontAwesomeIcons.moneyCheckDollar),
+        title: ("Orders"),
+        activeColorPrimary: Colors.orange,
+        inactiveColorPrimary: Colors.grey,
+      ),
+      PersistentBottomNavBarItem(
+        icon: const Icon(
+          FontAwesomeIcons.basketShopping,
+          size: 23,
+        ),
+        title: ("Cart"),
+        activeColorPrimary: Colors.orange,
+        inactiveColorPrimary: Colors.grey,
+      ),
+      PersistentBottomNavBarItem(
+        icon: const Icon(FontAwesomeIcons.grip),
+        title: ("Categores"),
+        activeColorPrimary: Colors.orange,
+        inactiveColorPrimary: Colors.grey,
+      ),
+      PersistentBottomNavBarItem(
+        icon: const Icon(Icons.person_2_rounded),
+        title: ("Profile"),
+        activeColorPrimary: Colors.orange,
+        inactiveColorPrimary: Colors.grey,
+      ),
+    ];
   }
 
   // Move the original content of HomeScreen to a separate method
   Widget _buildHomeScreenContent() {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          Gap(40.h),
-          _buildAppBar(),
-          _buildSearchBar(),
-          _buildCategoryList(),
-          _buildNewProducts(),
-        ],
+    return Container(
+      color:
+          AppColors.backgroundColorOne, // Explicitly set background color here
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Gap(40.h),
+            _buildAppBar(),
+            _buildSearchBar(),
+            _buildCategoryList(),
+            _buildNewProducts(),
+          ],
+        ),
       ),
     );
   }
@@ -470,34 +543,6 @@ class _HomeScreenState extends State<HomeScreen> {
           Gap(20.h),
         ],
       ),
-    );
-  }
-
-  BottomNavigationBar _buildBottomNavigationBar() {
-    return BottomNavigationBar(
-      backgroundColor: Colors.grey[900],
-      selectedItemColor: Colors.orange,
-      unselectedItemColor: Colors.grey,
-      currentIndex: currentIndex,
-      onTap: (int index) {
-        setState(() {
-          currentIndex = index;
-        });
-      },
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home_outlined),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.shopping_cart_outlined),
-          label: 'Cart',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person_outline),
-          label: 'Profile',
-        ),
-      ],
     );
   }
 }

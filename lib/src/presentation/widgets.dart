@@ -2,6 +2,7 @@ import 'package:balagh/src/core/app_color.dart';
 import 'package:firebase_cloud_firestore/firebase_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 
 class TextFieldModel extends StatelessWidget {
@@ -91,30 +92,31 @@ class TextFieldSearchModel extends StatelessWidget {
       controller: controller,
       decoration: InputDecoration(
         hintText: hintText,
-        prefixIcon:
-            const Icon(Icons.search, color: AppColors.backgroundColorGrey01),
-        suffixIcon:
-            const Icon(Icons.tune, color: AppColors.backgroundColorGrey01),
+        prefixIcon: const Icon(
+          FontAwesomeIcons.magnifyingGlass,
+          color: AppColors.backgroundColorGrey01,
+          size: 20,
+        ),
         hintStyle: Theme.of(context)
             .textTheme
             .labelMedium
-            ?.copyWith(color: AppColors.backgroundColorGrey01),
+            ?.copyWith(color: AppColors.backgroundColorGrey01, fontSize: 15),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(50),
           borderSide: const BorderSide(
-              color: AppColors.backgroundColorGrey01, width: 1.5),
+              color: AppColors.backgroundColorGrey03, width: 1.5),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(50),
           borderSide: const BorderSide(
-              color: AppColors.backgroundColorGrey01, width: 1.5),
+              color: AppColors.backgroundColorGrey03, width: 1.5),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(25),
           borderSide: const BorderSide(color: Colors.orange, width: 1.5),
         ),
         filled: true,
-        fillColor: AppColors.backgroundColorGrey03,
+        fillColor: AppColors.backgroundColorTwo,
         contentPadding: const EdgeInsets.symmetric(vertical: 15.0),
       ),
       style: Theme.of(context)
