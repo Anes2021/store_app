@@ -106,13 +106,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Welcome Anes!",
+                  "Welcome Guest!",
                   style: Theme.of(context)
                       .textTheme
                       .bodyMedium
                       ?.copyWith(fontSize: 20.sp),
                 ),
-                Text("Modifie your account settings here.",
+                Text("Please SignIn to modifie your account.",
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontSize: 13.sp, fontWeight: FontWeight.normal))
               ],

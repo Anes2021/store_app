@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:balagh/screens/admin/create_category_screen.dart';
 import 'package:balagh/src/core/app_color.dart';
 import 'package:balagh/src/presentation/widgets.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +16,15 @@ class CategoriesScreen extends StatefulWidget {
 
 class CategoresScreenState extends State<CategoriesScreen> {
   TextEditingController searchController = TextEditingController();
+  bool gridVerticalView = false;
+  final List<String> items = ["Most elements", "Best Seller"];
+
+  String? selectedItem;
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +36,7 @@ class CategoresScreenState extends State<CategoriesScreen> {
             searchBar(),
             Gap(10.h),
             categories(),
-            Gap(20.h),
+            Gap(10.h),
           ],
         ),
       ),
@@ -73,30 +85,143 @@ class CategoresScreenState extends State<CategoriesScreen> {
   Widget searchBar() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
         children: [
-          Expanded(
-            child: SizedBox(
-              height: 50.h,
-              child: TextFieldSearchModel(
-                  controller: searchController, hintText: "Search Here"),
-            ),
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    gridVerticalView = false;
+                  });
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: !gridVerticalView
+                          ? Colors.black
+                          : Colors.black.withOpacity(0.25),
+                      border: Border.all(color: Colors.black, width: 1.5)),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    child: Icon(
+                      Icons.grid_view_rounded,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                  ),
+                ),
+              ),
+              Gap(5.w),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    gridVerticalView = true;
+                  });
+                },
+                child: Container(
+                  decoration: gridVerticalView
+                      ? BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(color: Colors.black, width: 1.5),
+                          color: Colors.black)
+                      : BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          color: Colors.black.withOpacity(0.25),
+                          border: Border.all(color: Colors.black, width: 1.5)),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    child: Icon(
+                      Icons.view_agenda,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                  ),
+                ),
+              ),
+              const Spacer(),
+              DropdownButton<String>(
+                dropdownColor: AppColors.backgroundColorTwo,
+                value: selectedItem,
+                hint: Row(
+                  children: [
+                    Gap(5.w),
+                    Text(
+                      "Sort by",
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
+                icon: const Icon(
+                  Icons.arrow_drop_down,
+                  color: AppColors.backgroundColorGrey03,
+                ),
+                iconSize: 24,
+                elevation: 16,
+                style: const TextStyle(color: Colors.black, fontSize: 18),
+                underline: Container(
+                  height: 2,
+                  color: AppColors.backgroundColorGrey03,
+                ),
+                onChanged: (String? newValue) {
+                  log(newValue.toString());
+                  setState(() {
+                    selectedItem = newValue;
+                  });
+                },
+                items: items.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Row(
+                      children: [
+                        Gap(10.w),
+                        Text(
+                          value,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+              Gap(20.w),
+            ],
           ),
-          Gap(10.w),
-          Container(
-            width: 45.w,
-            height: 45.h,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(50),
-              color: Colors.orange,
-            ),
-            child: const Center(
-                child: Icon(
-              Icons.filter_list_rounded,
-              size: 25,
-              color: Colors.white,
-            )),
+          Gap(10.h),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: 50.h,
+                  child: TextFieldSearchModel(
+                      controller: searchController, hintText: "Search Here"),
+                ),
+              ),
+              Gap(10.w),
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (context) => const CreateCategoryScreen()),
+                  );
+                },
+                child: Container(
+                  width: 45.w,
+                  height: 45.h,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50),
+                    color: Colors.orange,
+                  ),
+                  child: const Center(
+                      child: Icon(
+                    Icons.filter_list_rounded,
+                    size: 25,
+                    color: Colors.white,
+                  )),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -107,8 +232,10 @@ class CategoresScreenState extends State<CategoriesScreen> {
     return Stack(
       children: [
         Container(
-          height: ((MediaQuery.of(context).size.width - 70) / 2).w,
-          width: ((MediaQuery.of(context).size.width - 70) / 2).w,
+          height: ((MediaQuery.of(context).size.width - 40) / 2),
+          width: gridVerticalView
+              ? MediaQuery.of(context).size.width - 20
+              : ((MediaQuery.of(context).size.width - 40) / 2),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(30), color: Colors.white),
           child: ClipRRect(
@@ -120,8 +247,10 @@ class CategoresScreenState extends State<CategoriesScreen> {
           ),
         ),
         Container(
-          height: ((MediaQuery.of(context).size.width - 70) / 2).w,
-          width: ((MediaQuery.of(context).size.width - 70) / 2).w,
+          height: ((MediaQuery.of(context).size.width - 40) / 2),
+          width: gridVerticalView
+              ? MediaQuery.of(context).size.width - 20
+              : ((MediaQuery.of(context).size.width - 40) / 2),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(30),
               color: Colors.black.withOpacity(0.5)),
@@ -154,24 +283,22 @@ class CategoresScreenState extends State<CategoriesScreen> {
   }
 
   Widget categories() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Wrap(
-        spacing: 10,
-        runSpacing: 10,
-        children: [
-          categoryTile("assets/categories_images/cpu_image.jpg", "CPUs", 38),
-          categoryTile("assets/categories_images/pc_image.png", "PC", 43),
-          categoryTile("assets/categories_images/mouse_image.png",
-              "Mouses & Keyboards", 4),
-          categoryTile("assets/categories_images/gpu_image.jpg", "GPUs", 432),
-          categoryTile("assets/categories_images/rams_image.png", "Rams", 43),
-          categoryTile(
-              "assets/categories_images/camera_image.png", "Cameras", 08),
-          categoryTile(
-              "assets/categories_images/iphone_image.jpg", "Iphones", 648),
-        ],
-      ),
+    return Wrap(
+      spacing: 5,
+      runSpacing: 5,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        categoryTile("assets/categories_images/cpu_image.jpg", "CPUs", 38),
+        categoryTile("assets/categories_images/pc_image.png", "PC", 43),
+        categoryTile("assets/categories_images/mouse_image.png",
+            "Mouses & Keyboards", 4),
+        categoryTile("assets/categories_images/gpu_image.jpg", "GPUs", 432),
+        categoryTile("assets/categories_images/rams_image.png", "Rams", 43),
+        categoryTile(
+            "assets/categories_images/camera_image.png", "Cameras", 08),
+        categoryTile(
+            "assets/categories_images/iphone_image.jpg", "Iphones", 648),
+      ],
     );
   }
 }
