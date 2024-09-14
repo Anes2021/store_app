@@ -2,7 +2,9 @@ import 'dart:developer';
 
 import 'package:balagh/screens/admin/create_category_screen.dart';
 import 'package:balagh/src/core/app_color.dart';
+import 'package:balagh/src/models/category_model.dart';
 import 'package:balagh/src/presentation/widgets.dart';
+import 'package:firebase_cloud_firestore/firebase_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
@@ -18,11 +20,26 @@ class CategoresScreenState extends State<CategoriesScreen> {
   TextEditingController searchController = TextEditingController();
   bool gridVerticalView = false;
   final List<String> items = ["Most elements", "Best Seller"];
-
   String? selectedItem;
+
+  late List<CategoryModel> listOfCategories = [];
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
   @override
   void initState() {
+    initPage();
     super.initState();
+  }
+
+  void initPage() async {
+    // Get all documents from the "categories" collection
+    QuerySnapshot snapshot = await firestore.collection("categories").get();
+
+    // Map each document into a CategoryModel
+    listOfCategories = snapshot.docs.map((doc) {
+      return CategoryModel.fromJson(doc.data()
+          as Map<String, dynamic>); // Pass the data map from the document
+    }).toList();
+    setState(() {});
   }
 
   @override
@@ -240,7 +257,7 @@ class CategoresScreenState extends State<CategoriesScreen> {
               borderRadius: BorderRadius.circular(30), color: Colors.white),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(30),
-            child: Image.asset(
+            child: Image.network(
               path,
               fit: BoxFit.cover,
             ),
@@ -284,21 +301,13 @@ class CategoresScreenState extends State<CategoriesScreen> {
 
   Widget categories() {
     return Wrap(
-      spacing: 5,
-      runSpacing: 5,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: [
-        categoryTile("assets/categories_images/cpu_image.jpg", "CPUs", 38),
-        categoryTile("assets/categories_images/pc_image.png", "PC", 43),
-        categoryTile("assets/categories_images/mouse_image.png",
-            "Mouses & Keyboards", 4),
-        categoryTile("assets/categories_images/gpu_image.jpg", "GPUs", 432),
-        categoryTile("assets/categories_images/rams_image.png", "Rams", 43),
-        categoryTile(
-            "assets/categories_images/camera_image.png", "Cameras", 08),
-        categoryTile(
-            "assets/categories_images/iphone_image.jpg", "Iphones", 648),
-      ],
-    );
+        spacing: 5,
+        runSpacing: 5,
+        crossAxisAlignment: WrapCrossAlignment.end,
+        children: List.generate(listOfCategories.length, (index) {
+          final item = listOfCategories[index];
+
+          return categoryTile(item.imageUrl.toString(), item.title, 00);
+        }));
   }
 }

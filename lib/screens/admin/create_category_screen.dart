@@ -1,13 +1,17 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:io';
+
 import 'package:balagh/src/core/app_color.dart';
-import 'package:balagh/src/models/shop_item_model.dart';
+import 'package:balagh/src/models/category_model.dart';
 import 'package:balagh/src/presentation/widgets.dart';
 import 'package:cherry_toast/cherry_toast.dart';
 import 'package:firebase_cloud_firestore/firebase_cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
 class CreateCategoryScreen extends StatefulWidget {
@@ -18,28 +22,50 @@ class CreateCategoryScreen extends StatefulWidget {
 }
 
 class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
+  XFile? _image;
   TextEditingController titleController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
-  TextEditingController priceController = TextEditingController();
-  TextEditingController oldpriceController = TextEditingController();
-  final List<String> priceTiles = ['false', 'true'];
-  final List<String> categoryTiles = [
-    'category1',
-    'category2',
-    'category3',
-    'category4',
-    'category5'
-  ];
-  String? priceSelectedTile;
-  String? categorySelectedTile;
-  bool isDiscounted = false;
-  double? discountPercantage;
+  final ImagePicker _picker = ImagePicker(); // ImagePicker instance
+  bool _uploading = false;
+  bool isVerticalVeiw = true;
+  String? downloadURL;
 
-  @override
-  void initState() {
-    priceSelectedTile = priceTiles[0];
-    categorySelectedTile = categoryTiles[0];
-    super.initState();
+  // Method to pick image using ImagePicker
+  Future<void> _pickImage() async {
+    final pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery); // Pick image
+    if (pickedFile != null) {
+      setState(() {
+        _image = pickedFile; // Assign XFile to _image
+      });
+    }
+  }
+
+  // Method to upload image to Firebase Storage
+  Future<void> _uploadImage() async {
+    if (_image == null) return; // Check if image is selected
+
+    setState(() {
+      _uploading = true; // Set uploading state to true
+    });
+
+    // Generate a unique file name using UUID or DateTime
+    String fileName = const Uuid().v4(); // Use UUID for unique file names
+    Reference storageRef =
+        FirebaseStorage.instance.ref().child('uploads/$fileName');
+
+    // Convert XFile to File and upload
+    File fileToUpload = File(_image!.path);
+
+    // Upload the file to Firebase Storage
+    UploadTask uploadTask = storageRef.putFile(fileToUpload);
+    TaskSnapshot snapshot = await uploadTask;
+
+    // Get the download URL of the uploaded file
+    downloadURL = await snapshot.ref.getDownloadURL();
+    setState(() {
+      downloadURL;
+      _uploading = false;
+    });
   }
 
   @override
@@ -51,7 +77,7 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
             minHeight: MediaQuery.of(context).size.height, // Ensure full height
           ),
           child: Padding(
-            padding: EdgeInsets.all(10.h),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -63,7 +89,7 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
                 textFields(),
                 Gap(10.h),
                 previewCategory(),
-                Gap(50.h),
+                Gap(20.h),
                 GestureDetector(
                   onTap: () async {
                     await createCategoryShop();
@@ -125,28 +151,68 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
   }
 
   Widget imagePickUpContainer() {
-    return Container(
-      width: double.infinity,
-      height: 150.h,
-      decoration: BoxDecoration(
-          color: Colors.orange,
-          border: Border.all(color: AppColors.backgroundColorGrey01, width: 2),
-          borderRadius: BorderRadius.circular(10)),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.camera_alt_rounded,
-            size: 40.sp,
-            color: AppColors.backgroundColorGrey02,
-          ),
-          Text(
-            "Add Photo to The Category.",
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: AppColors.backgroundColorGrey02, fontSize: 16),
-          )
-        ],
-      ),
+    return Stack(
+      children: [
+        GestureDetector(
+          onTap: () {
+            _pickImage();
+          },
+          child: Container(
+              width: double.infinity,
+              height: 150.h,
+              decoration: BoxDecoration(
+                  color: Colors.orange,
+                  border: Border.all(
+                      color: AppColors.backgroundColorGrey01, width: 2),
+                  borderRadius: BorderRadius.circular(10)),
+              child: (_image == null)
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.camera_alt_rounded,
+                          size: 40.sp,
+                          color: AppColors.backgroundColorGrey02,
+                        ),
+                        Text(
+                          "Add Photo to The Category.",
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge
+                              ?.copyWith(
+                                  color: AppColors.backgroundColorGrey02,
+                                  fontSize: 16),
+                        )
+                      ],
+                    )
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.file(
+                        File(_image!.path),
+                        fit: BoxFit.cover,
+                      ))),
+        ),
+        (_image != null)
+            ? GestureDetector(
+                onTap: () {
+                  _pickImage();
+                },
+                child: Container(
+                  width: double.infinity,
+                  height: 150.h,
+                  decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text((_image == null) ? "" : "Click to change Image")
+                    ],
+                  ),
+                ),
+              )
+            : Container(),
+      ],
     );
   }
 
@@ -156,7 +222,11 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
         TextFieldModel(
           controller: titleController,
           hintText: "put title here",
-          function: (String text) {},
+          function: (String text) {
+            setState(() {
+              titleController;
+            });
+          },
         ),
       ],
     );
@@ -182,6 +252,7 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
         ),
         Gap(10.h),
         Container(
+          width: isVerticalVeiw ? MediaQuery.of(context).size.width : 180.w,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
@@ -191,42 +262,109 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
             padding: const EdgeInsets.all(15),
             child: Column(
               children: [
-                Container(
-                    width: double.infinity.w,
-                    height: 150.h,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25),
-                        color: AppColors.backgroundColorTwo)),
+                Stack(
+                  children: [
+                    Container(
+                      width: isVerticalVeiw
+                          ? MediaQuery.of(context).size.width
+                          : 150.w,
+                      height: 150.h,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(25),
+                          color: AppColors.backgroundColorTwo),
+                      child: (_image == null)
+                          ? const Center(
+                              child: Text("no image"),
+                            )
+                          : ClipRRect(
+                              borderRadius: BorderRadius.circular(25),
+                              child: Image.file(
+                                File(_image!.path),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                    ),
+                    Container(
+                      width: isVerticalVeiw
+                          ? MediaQuery.of(context).size.width
+                          : 150.w,
+                      height: 150.h,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(25),
+                          color: Colors.black.withOpacity(0.4)),
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              (titleController.text.trim().isEmpty)
+                                  ? "category name"
+                                  : titleController.text,
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                            Text("0 item",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal))
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
                 Gap(10.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(color: Colors.black, width: 1.5),
-                          color: Colors.black.withOpacity(0.4)),
-                      child: const Padding(
-                        padding: EdgeInsets.all(5),
-                        child: Icon(
-                          Icons.grid_view_rounded,
-                          color: Colors.white,
-                          size: 30,
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isVerticalVeiw = false;
+                        });
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(color: Colors.black, width: 1.5),
+                            color: (isVerticalVeiw)
+                                ? Colors.black.withOpacity(0.4)
+                                : Colors.black),
+                        child: const Padding(
+                          padding: EdgeInsets.all(5),
+                          child: Icon(
+                            Icons.grid_view_rounded,
+                            color: Colors.white,
+                            size: 30,
+                          ),
                         ),
                       ),
                     ),
                     Gap(10.w),
-                    Container(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(color: Colors.black, width: 1.5),
-                          color: Colors.black),
-                      child: const Padding(
-                        padding: EdgeInsets.all(5),
-                        child: Icon(
-                          Icons.view_agenda,
-                          color: Colors.white,
-                          size: 30,
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isVerticalVeiw = true;
+                        });
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(color: Colors.black, width: 1.5),
+                            color: isVerticalVeiw
+                                ? Colors.black
+                                : Colors.black.withOpacity(0.4)),
+                        child: const Padding(
+                          padding: EdgeInsets.all(5),
+                          child: Icon(
+                            Icons.view_agenda,
+                            color: Colors.white,
+                            size: 30,
+                          ),
                         ),
                       ),
                     ),
@@ -243,11 +381,9 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
   Future<void> createCategoryShop() async {
     FirebaseFirestore fireStore = FirebaseFirestore.instance;
     String id = const Uuid().v4();
+    _uploadImage();
 
-    if (titleController.text.trim().isEmpty ||
-        descriptionController.text.trim().isEmpty ||
-        priceController.text.trim().isEmpty ||
-        int.tryParse(priceController.text) == null) {
+    if (titleController.text.trim().isEmpty) {
       CherryToast.error(
         description: Text(
           "please fill all informations",
@@ -257,26 +393,18 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
       ).show(context);
       return;
     } else {
-      ShopItemModel shopItemModel = ShopItemModel(
-        createdAt: DateTime.now(),
+      CategoryModel shopItemModel = CategoryModel(
         itemId: id,
         title: titleController.text,
-        description: descriptionController.text,
-        imageUrl: '',
-        price: int.tryParse(priceController.text) ?? 0, // Handle null safely
-        discount: isDiscounted,
-        likes: 0,
-        priceAfterDiscount: int.tryParse(oldpriceController.text) ?? 0,
-        views: 0,
-        category: categorySelectedTile ?? 'Unknown', // Fallback for null safety
+        imageUrl: downloadURL,
       );
       await fireStore
-          .collection("items_shop")
+          .collection("categories")
           .doc(id)
           .set(shopItemModel.toJson());
       CherryToast.success(
         description: Text(
-          "product added successfully",
+          "Category added successfully",
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontSize: 13.sp,
                 color: AppColors.backgroundColorGrey03,
