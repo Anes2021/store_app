@@ -1,5 +1,6 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, unused_field
 
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:balagh/src/core/app_color.dart';
@@ -27,7 +28,6 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
   final ImagePicker _picker = ImagePicker(); // ImagePicker instance
   bool _uploading = false;
   bool isVerticalVeiw = true;
-  String? downloadURL;
 
   // Method to pick image using ImagePicker
   Future<void> _pickImage() async {
@@ -38,34 +38,6 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
         _image = pickedFile; // Assign XFile to _image
       });
     }
-  }
-
-  // Method to upload image to Firebase Storage
-  Future<void> _uploadImage() async {
-    if (_image == null) return; // Check if image is selected
-
-    setState(() {
-      _uploading = true; // Set uploading state to true
-    });
-
-    // Generate a unique file name using UUID or DateTime
-    String fileName = const Uuid().v4(); // Use UUID for unique file names
-    Reference storageRef =
-        FirebaseStorage.instance.ref().child('uploads/$fileName');
-
-    // Convert XFile to File and upload
-    File fileToUpload = File(_image!.path);
-
-    // Upload the file to Firebase Storage
-    UploadTask uploadTask = storageRef.putFile(fileToUpload);
-    TaskSnapshot snapshot = await uploadTask;
-
-    // Get the download URL of the uploaded file
-    downloadURL = await snapshot.ref.getDownloadURL();
-    setState(() {
-      downloadURL;
-      _uploading = false;
-    });
   }
 
   @override
@@ -381,7 +353,6 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
   Future<void> createCategoryShop() async {
     FirebaseFirestore fireStore = FirebaseFirestore.instance;
     String id = const Uuid().v4();
-    _uploadImage();
 
     if (titleController.text.trim().isEmpty) {
       CherryToast.error(
@@ -393,6 +364,33 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
       ).show(context);
       return;
     } else {
+      if (_image == null) return; // Check if image is selected
+
+      setState(() {
+        _uploading = true; // Set uploading state to true
+      });
+      String downloadURL;
+      // Generate a unique file name using UUID or DateTime
+      String fileName = const Uuid().v4(); // Use UUID for unique file names
+      Reference storageRef =
+          FirebaseStorage.instance.ref().child('uploads/$fileName');
+
+      // Convert XFile to File and upload
+      File fileToUpload = File(_image!.path);
+
+      // Upload the file to Firebase Storage
+      UploadTask uploadTask = storageRef.putFile(fileToUpload);
+      TaskSnapshot snapshot = await uploadTask;
+      log(snapshot.toString());
+
+      // Get the download URL of the uploaded file
+      downloadURL = await snapshot.ref.getDownloadURL();
+      log(downloadURL.toString());
+      setState(() {
+        downloadURL;
+        _uploading = false;
+      });
+      log("klb0$downloadURL");
       CategoryModel shopItemModel = CategoryModel(
         itemId: id,
         title: titleController.text,

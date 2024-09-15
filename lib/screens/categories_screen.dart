@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:balagh/screens/admin/create_category_screen.dart';
+import 'package:balagh/screens/category_detailed_screen.dart';
 import 'package:balagh/src/core/app_color.dart';
 import 'package:balagh/src/models/category_model.dart';
 import 'package:balagh/src/presentation/widgets.dart';
@@ -39,7 +40,9 @@ class CategoresScreenState extends State<CategoriesScreen> {
       return CategoryModel.fromJson(doc.data()
           as Map<String, dynamic>); // Pass the data map from the document
     }).toList();
-    setState(() {});
+    setState(() {
+      listOfCategories;
+    });
   }
 
   @override
@@ -245,57 +248,68 @@ class CategoresScreenState extends State<CategoriesScreen> {
     );
   }
 
-  Widget categoryTile(String path, String name, int numberItems) {
-    return Stack(
-      children: [
-        Container(
-          height: ((MediaQuery.of(context).size.width - 40) / 2),
-          width: gridVerticalView
-              ? MediaQuery.of(context).size.width - 20
-              : ((MediaQuery.of(context).size.width - 40) / 2),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30), color: Colors.white),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(30),
-            child: Image.network(
-              path,
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
-        Container(
-          height: ((MediaQuery.of(context).size.width - 40) / 2),
-          width: gridVerticalView
-              ? MediaQuery.of(context).size.width - 20
-              : ((MediaQuery.of(context).size.width - 40) / 2),
-          decoration: BoxDecoration(
+  Widget categoryTile(
+      String path, String name, int numberItems, CategoryModel categoryModel) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+              builder: (context) => CategoryDetailedScreen(
+                    categoryModel: categoryModel,
+                  )),
+        );
+      },
+      child: Stack(
+        children: [
+          Container(
+            height: ((MediaQuery.of(context).size.width - 40) / 2),
+            width: gridVerticalView
+                ? MediaQuery.of(context).size.width - 20
+                : ((MediaQuery.of(context).size.width - 40) / 2),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30), color: Colors.white),
+            child: ClipRRect(
               borderRadius: BorderRadius.circular(30),
-              color: Colors.black.withOpacity(0.5)),
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  name,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium
-                      ?.copyWith(fontSize: 14),
-                ),
-                Text(
-                  "$numberItems Item",
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium
-                      ?.copyWith(fontSize: 13, fontWeight: FontWeight.normal),
-                )
-              ],
+              child: Image.network(
+                path,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
-        )
-      ],
+          Container(
+            height: ((MediaQuery.of(context).size.width - 40) / 2),
+            width: gridVerticalView
+                ? MediaQuery.of(context).size.width - 20
+                : ((MediaQuery.of(context).size.width - 40) / 2),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                color: Colors.black.withOpacity(0.5)),
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    name,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.copyWith(fontSize: 14),
+                  ),
+                  Text(
+                    "$numberItems Item",
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.copyWith(fontSize: 13, fontWeight: FontWeight.normal),
+                  )
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
     );
   }
 
@@ -307,7 +321,8 @@ class CategoresScreenState extends State<CategoriesScreen> {
         children: List.generate(listOfCategories.length, (index) {
           final item = listOfCategories[index];
 
-          return categoryTile(item.imageUrl.toString(), item.title, 00);
+          return categoryTile(item.imageUrl.toString(), item.title, 00,
+              listOfCategories[index]);
         }));
   }
 }
