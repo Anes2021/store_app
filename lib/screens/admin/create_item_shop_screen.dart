@@ -1,6 +1,8 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:balagh/src/core/app_color.dart';
+import 'package:balagh/src/models/category_model.dart';
 import 'package:balagh/src/models/shop_item_model.dart';
 import 'package:balagh/src/presentation/widgets.dart';
 import 'package:cherry_toast/cherry_toast.dart';
@@ -8,6 +10,7 @@ import 'package:firebase_cloud_firestore/firebase_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
 class CreateItemShopScreen extends StatefulWidget {
@@ -23,22 +26,45 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
   TextEditingController priceController = TextEditingController();
   TextEditingController oldpriceController = TextEditingController();
   final List<String> priceTiles = ['false', 'true'];
-  final List<String> categoryTiles = [
-    'category1',
-    'category2',
-    'category3',
-    'category4',
-    'category5'
-  ];
+  List<CategoryModel> categoryTiles = [];
   String? priceSelectedTile;
   String? categorySelectedTile;
   bool isDiscounted = false;
   double? discountPercantage;
+  final bool _uploading = false;
+  final ImagePicker _picker = ImagePicker();
+  XFile? _image;
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  Future<void> _pickImage() async {
+    final pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery); // Pick image
+    if (pickedFile != null) {
+      setState(() {
+        _image = pickedFile; // Assign XFile to _image
+      });
+    }
+  }
+
+  void initPage() async {
+    // Get all documents from the "categories" collection
+    QuerySnapshot snapshot = await firestore.collection("categories").get();
+
+    // Map each document into a CategoryModel
+    categoryTiles = snapshot.docs.map((doc) {
+      return CategoryModel.fromJson(doc.data()
+          as Map<String, dynamic>); // Pass the data map from the document
+    }).toList();
+    setState(() {
+      categoryTiles;
+    });
+  }
 
   @override
   void initState() {
     priceSelectedTile = priceTiles[0];
-    categorySelectedTile = categoryTiles[0];
+    categorySelectedTile = categoryTiles[0].toString();
+    initPage();
     super.initState();
   }
 
@@ -110,6 +136,17 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
                 decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10)),
+                child: (_image == null)
+                    ? const Center(
+                        child: Text("no image"),
+                      )
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.file(
+                          File(_image!.path),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
               ),
               Gap(5.h),
               Padding(
@@ -275,28 +312,68 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
   }
 
   Widget imagePickUpContainer() {
-    return Container(
-      width: double.infinity,
-      height: 100.h,
-      decoration: BoxDecoration(
-          color: Colors.orange,
-          border: Border.all(color: AppColors.backgroundColorGrey01, width: 2),
-          borderRadius: BorderRadius.circular(10)),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.camera_alt_rounded,
-            size: 40.sp,
-            color: AppColors.backgroundColorGrey02,
-          ),
-          Text(
-            "Add Photos to The Product.",
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: AppColors.backgroundColorGrey02, fontSize: 16),
-          )
-        ],
-      ),
+    return Stack(
+      children: [
+        GestureDetector(
+          onTap: () {
+            _pickImage();
+          },
+          child: Container(
+              width: double.infinity,
+              height: 150.h,
+              decoration: BoxDecoration(
+                  color: Colors.orange,
+                  border: Border.all(
+                      color: AppColors.backgroundColorGrey01, width: 2),
+                  borderRadius: BorderRadius.circular(10)),
+              child: (_image == null)
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.camera_alt_rounded,
+                          size: 40.sp,
+                          color: AppColors.backgroundColorGrey02,
+                        ),
+                        Text(
+                          "Add Photo to The Category.",
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge
+                              ?.copyWith(
+                                  color: AppColors.backgroundColorGrey02,
+                                  fontSize: 16),
+                        )
+                      ],
+                    )
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.file(
+                        File(_image!.path),
+                        fit: BoxFit.cover,
+                      ))),
+        ),
+        (_image != null)
+            ? GestureDetector(
+                onTap: () {
+                  _pickImage();
+                },
+                child: Container(
+                  width: double.infinity,
+                  height: 150.h,
+                  decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text((_image == null) ? "" : "Click to change Image")
+                    ],
+                  ),
+                ),
+              )
+            : Container(),
+      ],
     );
   }
 
@@ -306,7 +383,11 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
         TextFieldModel(
           controller: titleController,
           hintText: "put title here",
-          function: (String text) {},
+          function: (String text) {
+            setState(() {
+              titleController;
+            });
+          },
         ),
         Gap(10.h),
         TextFieldModel(
@@ -315,7 +396,11 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
           textFieldHeight: 15,
           controller: descriptionController,
           hintText: "put description here",
-          function: (String text) {},
+          function: (String text) {
+            setState(() {
+              descriptionController;
+            });
+          },
         ),
       ],
     );
@@ -353,7 +438,11 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
                 controller: priceController,
                 hintText: (isDiscounted == false) ? "Add Price" : "Old Price",
                 enabled: (isDiscounted == true) ? false : true,
-                function: (String text) {},
+                function: (String text) {
+                  setState(() {
+                    priceController;
+                  });
+                },
               ),
             ),
             Gap(10.w),
@@ -494,7 +583,12 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
                     width: 65.w,
                     child: Center(
                       child: TextFieldModel(
-                        function: (newPrice) {},
+                        function: (newPrice) {
+                          setState(() {
+                            discountPercantage;
+                            newPrice;
+                          });
+                        },
                         enabled: false,
                         controller: TextEditingController(),
                         hintText: "$discountPercantage",

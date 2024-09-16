@@ -25,7 +25,7 @@ class CreateCategoryScreen extends StatefulWidget {
 class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
   XFile? _image;
   TextEditingController titleController = TextEditingController();
-  final ImagePicker _picker = ImagePicker(); // ImagePicker instance
+  final ImagePicker _picker = ImagePicker();
   bool _uploading = false;
   bool isVerticalVeiw = true;
 
