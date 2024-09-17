@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, avoid_print
+
 import 'dart:developer';
 import 'dart:io';
 
@@ -7,6 +9,7 @@ import 'package:balagh/src/models/shop_item_model.dart';
 import 'package:balagh/src/presentation/widgets.dart';
 import 'package:cherry_toast/cherry_toast.dart';
 import 'package:firebase_cloud_firestore/firebase_cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
@@ -46,26 +49,29 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
     }
   }
 
-  void initPage() async {
-    // Get all documents from the "categories" collection
-    QuerySnapshot snapshot = await firestore.collection("categories").get();
-
-    // Map each document into a CategoryModel
-    categoryTiles = snapshot.docs.map((doc) {
-      return CategoryModel.fromJson(doc.data()
-          as Map<String, dynamic>); // Pass the data map from the document
-    }).toList();
-    setState(() {
-      categoryTiles;
-    });
-  }
-
   @override
   void initState() {
     priceSelectedTile = priceTiles[0];
-    categorySelectedTile = categoryTiles[0].toString();
+
     initPage();
     super.initState();
+  }
+
+  void initPage() async {
+    QuerySnapshot snapshot = await firestore.collection("categories").get();
+
+    // Map Firestore documents to CategoryModel and store them in categoryTiles
+    categoryTiles = snapshot.docs.map((doc) {
+      return CategoryModel.fromJson(doc.data() as Map<String, dynamic>);
+    }).toList();
+
+    // If categories are fetched, initialize categorySelectedTile
+    if (categoryTiles.isNotEmpty) {
+      setState(() {
+        categorySelectedTile =
+            categoryTiles[0].title.toString(); // Use the first category's ID
+      });
+    }
   }
 
   @override
@@ -97,10 +103,11 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                        color: Colors.orange,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                            color: AppColors.backgroundColorGrey01, width: 2)),
+                      color: Colors.orange,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                          color: AppColors.backgroundColorGrey01, width: 2),
+                    ),
                     child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 15),
                       child: Center(child: Text("Create Item Shop")),
@@ -636,7 +643,9 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Category",
+                        categoryTiles.isNotEmpty
+                            ? "Category"
+                            : "There isn't Categories, Create some.",
                         style: Theme.of(context)
                             .textTheme
                             .labelMedium
@@ -645,38 +654,49 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
                       Expanded(
                         child: ListTile(
                           minTileHeight: 49,
-                          trailing: DropdownButton<String>(
-                            value: categorySelectedTile,
-                            items: categoryTiles
-                                .map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(
-                                  value,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .labelMedium
-                                      ?.copyWith(color: Colors.orange),
-                                ),
-                              );
-                            }).toList(),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                categorySelectedTile = newValue;
-                              });
-                              CherryToast.info(
-                                description: Text(
-                                  "product category changed to $newValue",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium
-                                      ?.copyWith(
-                                          fontSize: 13.sp,
-                                          color:
-                                              AppColors.backgroundColorGrey03),
-                                ),
-                              ).show(context);
-                            },
+                          trailing: DropdownButton<CategoryModel>(
+                            value: categoryTiles.isNotEmpty
+                                ? categoryTiles.firstWhere(
+                                    (element) =>
+                                        element.itemId == categorySelectedTile,
+                                    orElse: () => categoryTiles[0])
+                                : null, // Handle case when categoryTiles is empty
+                            items: categoryTiles.isNotEmpty
+                                ? categoryTiles
+                                    .map<DropdownMenuItem<CategoryModel>>(
+                                        (CategoryModel value) {
+                                    return DropdownMenuItem<CategoryModel>(
+                                      value: value,
+                                      child: Text(
+                                        value.title, // Display category name
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelMedium
+                                            ?.copyWith(color: Colors.orange),
+                                      ),
+                                    );
+                                  }).toList()
+                                : [], // Provide an empty list if categoryTiles is empty
+                            onChanged: categoryTiles.isNotEmpty
+                                ? (CategoryModel? newValue) {
+                                    setState(() {
+                                      categorySelectedTile = newValue
+                                          ?.itemId; // Store the selected category's ID
+                                    });
+                                    CherryToast.info(
+                                      description: Text(
+                                        "Product category changed to ${newValue?.title}",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium
+                                            ?.copyWith(
+                                                fontSize: 13.sp,
+                                                color: AppColors
+                                                    .backgroundColorGrey03),
+                                      ),
+                                    ).show(context);
+                                  }
+                                : null, // Disable dropdown if there are no categories
                             underline: Container(),
                             iconSize: 0,
                           ),
@@ -759,50 +779,89 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
     ).show(context);
   }
 
-  Future<void> createItemShop() async {
-    FirebaseFirestore fireStore = FirebaseFirestore.instance;
-    String id = const Uuid().v4();
+  Future<String> uploadImageFile(XFile imageFile) async {
+    String fileName =
+        "images/${const Uuid().v4()}.jpg"; // Ensuring a unique file name
+    File file = File(imageFile.path);
 
+    try {
+      firebase_storage.Reference ref =
+          firebase_storage.FirebaseStorage.instance.ref().child(fileName);
+      firebase_storage.UploadTask uploadTask = ref.putFile(file);
+      firebase_storage.TaskSnapshot snapshot = await uploadTask;
+      String downloadUrl = await snapshot.ref.getDownloadURL();
+      return downloadUrl; // This URL can be stored in Firestore
+    } catch (e) {
+      print(e);
+      return ''; // Handle errors appropriately
+    }
+  }
+
+  Future<void> createItemShop() async {
+    // Validate input fields
     if (titleController.text.trim().isEmpty ||
         descriptionController.text.trim().isEmpty ||
         priceController.text.trim().isEmpty ||
-        int.tryParse(priceController.text) == null) {
+        int.tryParse(priceController.text) == null ||
+        categorySelectedTile == null ||
+        _image == null) {
       CherryToast.error(
         description: Text(
-          "please fill all informations",
+          "Please fill all information and select an image",
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontSize: 13.sp, color: AppColors.backgroundColorGrey03),
         ),
       ).show(context);
       return;
-    } else {
-      ShopItemModel shopItemModel = ShopItemModel(
-        createdAt: DateTime.now(),
-        itemId: id,
-        title: titleController.text,
-        description: descriptionController.text,
-        imageUrl: '',
-        price: int.tryParse(priceController.text) ?? 0, // Handle null safely
-        discount: isDiscounted,
-        likes: 0,
-        priceAfterDiscount: int.tryParse(oldpriceController.text) ?? 0,
-        views: 0,
-        category: categorySelectedTile ?? 'Unknown', // Fallback for null safety
-      );
-      await fireStore
-          .collection("items_shop")
-          .doc(id)
-          .set(shopItemModel.toJson());
-      CherryToast.success(
+    }
+
+    // Upload image and get URL
+    String imageUrl = await uploadImageFile(_image!);
+    if (imageUrl.isEmpty) {
+      CherryToast.error(
         description: Text(
-          "product added successfully",
+          "Failed to upload image",
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontSize: 13.sp,
                 color: AppColors.backgroundColorGrey03,
               ),
         ),
       ).show(context);
-      Navigator.of(context).pop();
+      return; // Exit if the image fails to upload
     }
+    log(categorySelectedTile!);
+    // Continue with creating the item if the image upload was successful
+    ShopItemModel shopItemModel = ShopItemModel(
+      createdAt: DateTime.now(),
+      itemId: const Uuid().v4(),
+      title: titleController.text,
+      description: descriptionController.text,
+      imageUrl: imageUrl, // Store the URL from Firebase Storage
+      price: int.tryParse(priceController.text) ?? 0,
+      discount: isDiscounted,
+      likes: 0,
+      priceAfterDiscount: int.tryParse(oldpriceController.text) ?? 0,
+      views: 0,
+      category: categorySelectedTile
+          .toString(), // Assuming this returns the correct string representation for category
+    );
+
+    // Save the item data to Firestore
+    await FirebaseFirestore.instance
+        .collection("items_shop")
+        .doc(shopItemModel.itemId)
+        .set(shopItemModel.toJson());
+
+    // Show success message and navigate back
+    CherryToast.success(
+      description: Text(
+        "Product added successfully",
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontSize: 13.sp,
+              color: AppColors.backgroundColorGrey03,
+            ),
+      ),
+    ).show(context);
+    Navigator.of(context).pop(); // Optionally navigate back or clear fields
   }
 }

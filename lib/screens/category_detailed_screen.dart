@@ -1,3 +1,4 @@
+import 'package:balagh/screens/home_screen.dart';
 import 'package:balagh/screens/item_shop_screen.dart';
 import 'package:balagh/src/core/app_color.dart';
 import 'package:balagh/src/models/category_model.dart';
@@ -32,8 +33,11 @@ class _CategoryDetailedScreenState extends State<CategoryDetailedScreen> {
     setState(() {
       isItemLoading = true;
     });
-    listOfItemsNEW =
-        await firestore.collection("items_shop").get().then((snapshot) {
+    listOfItemsNEW = await firestore
+        .collection("items_shop")
+        .where('category', isEqualTo: widget.categoryModel.title)
+        .get()
+        .then((snapshot) {
       return snapshot.docs.map((doc) {
         return ShopItemModel.fromJson(doc.data());
       }).toList();
@@ -310,14 +314,13 @@ class _CategoryDetailedScreenState extends State<CategoryDetailedScreen> {
                   return SizedBox(
                     width: (MediaQuery.of(context).size.width - 30) /
                         2, // 2 columns
-                    child: newProductsItem(
-                      item.title, // name
-                      item.description, // description
-                      item.price, // price
-                      item.discount, // discount
-                      item.priceAfterDiscount, // new price
-                      true, // isNew
-                      item, // ShopItemModel
+                    child: NewProductItem(
+                      title: item.title,
+                      description: item.description,
+                      price: item.priceAfterDiscount,
+                      discount: item.discount,
+                      beforePrice: item.price,
+                      itemModel: item,
                     ),
                   );
                 }),

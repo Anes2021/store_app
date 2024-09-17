@@ -1,3 +1,5 @@
+// ignore_for_file: unused_element
+
 import 'package:balagh/screens/admin/create_item_shop_screen.dart';
 import 'package:balagh/screens/cart_screen.dart';
 import 'package:balagh/screens/categories_screen.dart';
@@ -6,6 +8,7 @@ import 'package:balagh/screens/orders_screen.dart';
 import 'package:balagh/screens/profile_screen.dart';
 import 'package:balagh/src/core/app_color.dart';
 import 'package:balagh/src/models/shop_item_model.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_cloud_firestore/firebase_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -309,7 +312,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget newProductsItem(String title, String description, int price,
-      bool discount, int beforePrice, bool isNew, ShopItemModel itemModel) {
+      bool discount, int beforePrice, ShopItemModel itemModel) {
     return Stack(
       children: [
         GestureDetector(
@@ -338,141 +341,35 @@ class _HomeScreenState extends State<HomeScreen> {
                   decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10)),
-                ),
-                Gap(5.h),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 5.w),
-                  child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    decoration: BoxDecoration(
-                        color: AppColors.backgroundColorGrey03,
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium
-                              ?.copyWith(
-                                  color: AppColors.backgroundColorGrey02),
-                        ),
-                        Gap(3.h),
-                        Text(
-                          description,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 3,
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleSmall
-                              ?.copyWith(
-                                  color: AppColors.backgroundColorGrey01),
-                        ),
-                        Gap(5.h),
-                        discount
-                            ? Text(
-                                "$price£",
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
-                                    ?.copyWith(
-                                      color: Colors.red[800],
-                                      fontSize: 13.sp,
-                                      decoration: TextDecoration.lineThrough,
-                                      decorationColor: Colors.red[800],
-                                      decorationThickness: 1.0,
-                                    ),
-                              )
-                            : Gap(17.h),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                "$price£",
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
-                                    ?.copyWith(
-                                        color: AppColors.backgroundColorGrey02),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: itemModel.imageUrl != null &&
+                            itemModel.imageUrl!.isNotEmpty
+                        ? CachedNetworkImage(
+                            imageUrl: itemModel.imageUrl!,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                            errorWidget: (context, url, error) => const Center(
+                              child: Icon(
+                                Icons.error,
+                                color: Colors.red,
                               ),
                             ),
-                            Text(
-                              '(4.5)',
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                            Icon(
-                              Icons.star_rate,
-                              color: Colors.orange,
-                              size: 27.sp,
-                            )
-                          ],
-                        ),
-                        Gap(10.h),
-                        Row(
-                          children: [
-                            Expanded(
-                                child: Container(
-                              height: 30.h,
-                              decoration: BoxDecoration(
-                                  color: Colors.transparent,
-                                  border: Border.all(
-                                      color: Colors.orange, width: 1.5),
-                                  borderRadius: BorderRadius.circular(5)),
-                              child: Center(
-                                child: Icon(
-                                  Icons.add_shopping_cart_rounded,
-                                  size: 25.sp,
-                                  color: Colors.orange,
-                                ),
-                              ),
-                            )),
-                            Gap(5.w),
-                            Expanded(
-                                child: Container(
-                              height: 30.h,
-                              decoration: BoxDecoration(
-                                  color: Colors.orange,
-                                  borderRadius: BorderRadius.circular(5)),
-                              child: Center(
-                                child: Icon(
-                                  Icons.favorite_rounded,
-                                  size: 25.sp,
-                                  color: AppColors.backgroundColorGrey03,
-                                ),
-                              ),
-                            )),
-                          ],
-                        ),
-                        Gap(6.h)
-                      ],
-                    ),
+                          )
+                        : Center(
+                            child: Text('No image available',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium)), // Display this when URL is null or empty
                   ),
                 ),
+                Gap(5.h),
               ],
             ),
           ),
         ),
-        Positioned(
-          right: 10,
-          child: SizedBox(
-            height: 50,
-            width: 20,
-            child: isNew
-                ? Image.asset(
-                    "assets/images/new_sign.png",
-                    fit: BoxFit.cover,
-                  )
-                : null,
-          ),
-        )
       ],
     );
   }
@@ -528,20 +425,276 @@ class _HomeScreenState extends State<HomeScreen> {
                         return SizedBox(
                           width: (MediaQuery.of(context).size.width - 30) /
                               2, // 2 columns
-                          child: newProductsItem(
-                            item.title, // name
-                            item.description, // description
-                            item.price, // price
-                            item.discount, // discount
-                            item.priceAfterDiscount, // new price
-                            true, // isNew
-                            item, // ShopItemModel
+                          child: NewProductItem(
+                            title: item.title,
+                            description: item.description,
+                            price: item.priceAfterDiscount,
+                            discount: item.discount,
+                            beforePrice: item.price,
+                            itemModel: item,
                           ),
                         );
                       }),
                     ),
           Gap(20.h),
         ],
+      ),
+    );
+  }
+}
+
+class NewProductItem extends StatelessWidget {
+  final String title;
+  final String description;
+  final int price;
+  final bool discount;
+  final int beforePrice;
+  final ShopItemModel itemModel;
+
+  const NewProductItem({
+    super.key,
+    required this.title,
+    required this.description,
+    required this.price,
+    required this.discount,
+    required this.beforePrice,
+    required this.itemModel,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _navigateToItemShopScreen(context, itemModel),
+      child: Container(
+        width: (MediaQuery.of(context).size.width - 30.w) / 2,
+        decoration: _itemDecoration(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _productImage(context),
+            _productDetails(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  BoxDecoration _itemDecoration() {
+    return BoxDecoration(
+      border: Border.all(color: AppColors.backgroundColorGrey01, width: 1),
+      color: AppColors.backgroundColorGrey03,
+      borderRadius: BorderRadius.circular(10),
+    );
+  }
+
+  Widget _productImage(BuildContext context) {
+    return Container(
+      height: 140.h,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: itemModel.imageUrl != null && itemModel.imageUrl!.isNotEmpty
+            ? CachedNetworkImage(
+                imageUrl: itemModel.imageUrl!,
+                fit: BoxFit.cover,
+                placeholder: (context, url) =>
+                    const Center(child: CircularProgressIndicator()),
+                errorWidget: (context, url, error) =>
+                    const Center(child: Icon(Icons.error, color: Colors.red)),
+              )
+            : Center(
+                child: Text('No image available',
+                    style: Theme.of(context).textTheme.bodyMedium)),
+      ),
+    );
+  }
+
+  Widget _productDetails(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 5.w),
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        height: 200,
+        decoration: BoxDecoration(
+            color: AppColors.backgroundColorGrey03,
+            borderRadius: BorderRadius.circular(10)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: AppColors.backgroundColorGrey02, fontSize: 18),
+            ),
+            Text(
+              description,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 3,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleSmall
+                  ?.copyWith(color: AppColors.backgroundColorGrey01),
+            ),
+            const Expanded(
+                child: SizedBox(
+              width: 0,
+            )),
+            discount
+                ? Text(
+                    "$beforePrice£",
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: Colors.red[800],
+                          fontSize: 13.sp,
+                          decoration: TextDecoration.lineThrough,
+                          decorationColor: Colors.red[800],
+                          decorationThickness: 1.0,
+                        ),
+                  )
+                : Gap(17.h),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: Text(
+                    "$price£",
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleLarge
+                        ?.copyWith(color: AppColors.backgroundColorGrey02),
+                  ),
+                ),
+                Text(
+                  '(4.5)',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                Icon(
+                  Icons.star_rate,
+                  color: Colors.orange,
+                  size: 27.sp,
+                )
+              ],
+            ),
+            Gap(10.h),
+            Row(
+              children: [
+                Expanded(
+                    child: Container(
+                  height: 30.h,
+                  decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      border: Border.all(color: Colors.orange, width: 1.5),
+                      borderRadius: BorderRadius.circular(5)),
+                  child: Center(
+                    child: Icon(
+                      Icons.add_shopping_cart_rounded,
+                      size: 25.sp,
+                      color: Colors.orange,
+                    ),
+                  ),
+                )),
+                Gap(5.w),
+                Expanded(
+                    child: Container(
+                  height: 30.h,
+                  decoration: BoxDecoration(
+                      color: Colors.orange,
+                      borderRadius: BorderRadius.circular(5)),
+                  child: Center(
+                    child: Icon(
+                      Icons.favorite_rounded,
+                      size: 25.sp,
+                      color: AppColors.backgroundColorGrey03,
+                    ),
+                  ),
+                )),
+              ],
+            ),
+            Gap(6.h)
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _priceDetails(BuildContext context) {
+    return Text(
+      discount ? "$price£" : "$beforePrice£",
+      overflow: TextOverflow.ellipsis,
+      maxLines: 1,
+      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            color: discount ? Colors.red[800] : AppColors.backgroundColorGrey02,
+            fontSize: 13.sp,
+            decoration: discount ? TextDecoration.lineThrough : null,
+            decorationColor: Colors.red[800],
+            decorationThickness: 1.0,
+          ),
+    );
+  }
+
+  Widget _actionButtons(BuildContext context) {
+    return Row(
+      children: [
+        _shoppingCartButton(),
+        Gap(5.w),
+        _favoriteButton(),
+      ],
+    );
+  }
+
+  Widget _shoppingCartButton() {
+    return Expanded(
+      child: Container(
+        height: 30.h,
+        decoration: BoxDecoration(
+          color: Colors.transparent,
+          border: Border.all(color: Colors.orange, width: 1.5),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Center(
+          child: Icon(
+            Icons.add_shopping_cart_rounded,
+            size: 25.sp,
+            color: Colors.orange,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _favoriteButton() {
+    return Expanded(
+      child: Container(
+        height: 30.h,
+        decoration: BoxDecoration(
+          color: Colors.orange,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Center(
+          child: Icon(
+            Icons.favorite_rounded,
+            size: 25.sp,
+            color: AppColors.backgroundColorGrey03,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _navigateToItemShopScreen(
+      BuildContext context, ShopItemModel itemModel) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ItemShopScreen(itemModel: itemModel),
       ),
     );
   }
