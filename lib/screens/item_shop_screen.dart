@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:balagh/src/core/app_color.dart';
 import 'package:balagh/src/models/shop_item_model.dart';
 import 'package:balagh/src/presentation/widgets.dart';
+import 'package:balagh/src/services/shared_prefrences_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
@@ -195,32 +198,8 @@ class _ItemShopScreenState extends State<ItemShopScreen> {
                   ),
                 ),
                 Gap(10.w),
-                GestureDetector(
-                  onTap: () {},
-                  child: Container(
-                    width: 50.w,
-                    height: 50.h,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.orange,
-                        width: 2.sp,
-                      ),
-                      borderRadius: BorderRadius.circular(10.sp),
-                      color: AppColors.backgroundColorOne,
-                    ),
-                    child: const Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.favorite_border_sharp,
-                            color: Colors.orange,
-                            size: 30,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                LikeButton(
+                  id: widget.itemModel.itemId,
                 ),
                 Gap(10.w),
               ],
@@ -355,6 +334,85 @@ class _ItemShopScreenState extends State<ItemShopScreen> {
                   fontWeight: FontWeight.bold),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class LikeButton extends StatefulWidget {
+  const LikeButton({
+    super.key,
+    required this.id,
+  });
+
+  final String id;
+
+  @override
+  State<LikeButton> createState() => _LikeButtonState();
+}
+
+class _LikeButtonState extends State<LikeButton> {
+  bool isLiked = true;
+  final prefrences = SharedPrefrencesController();
+  @override
+  void initState() {
+    initPage();
+    super.initState();
+  }
+
+  void initPage() async {
+    List favoritesList = await prefrences.readFavoritesList();
+    log(favoritesList.toString());
+    isLiked = favoritesList.contains(widget.id);
+    setState(() {});
+  }
+
+  void clickedLike() async {
+    List<String> favoritesList = await prefrences.readFavoritesList();
+    if (isLiked) {
+      favoritesList.remove(widget.id);
+      await prefrences.writeFavorites(favoritesList);
+      setState(() {
+        isLiked = !isLiked;
+      });
+    } else {
+      favoritesList.add(widget.id);
+      await prefrences.writeFavorites(favoritesList);
+      setState(() {
+        isLiked = !isLiked;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        clickedLike();
+      },
+      child: Container(
+        width: 50.w,
+        height: 50.h,
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.orange,
+            width: 2.sp,
+          ),
+          borderRadius: BorderRadius.circular(10.sp),
+          color: AppColors.backgroundColorOne,
+        ),
+        child: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                isLiked ? Icons.favorite : Icons.favorite_border_sharp,
+                color: Colors.orange,
+                size: 30,
+              ),
+            ],
+          ),
         ),
       ),
     );

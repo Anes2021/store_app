@@ -13,13 +13,11 @@ class OrdersScreen extends StatefulWidget {
 class _OrdersScreenState extends State<OrdersScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            appBar(),
-          ],
-        ),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          appBar(),
+        ],
       ),
     );
   }

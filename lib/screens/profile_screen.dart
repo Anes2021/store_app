@@ -1,3 +1,4 @@
+import 'package:balagh/screens/favorites_screen.dart';
 import 'package:balagh/src/core/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -13,21 +14,19 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            appBar(),
-            Gap(20.h),
-            welcomeSign(),
-            Gap(10.h),
-            settingsTiles(),
-            Gap(10.h),
-            settingsTiles2(),
-            Gap(10.h),
-            contactUs()
-          ],
-        ),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          appBar(),
+          Gap(20.h),
+          welcomeSign(),
+          Gap(10.h),
+          settingsTiles(),
+          Gap(10.h),
+          settingsTiles2(),
+          Gap(10.h),
+          contactUs()
+        ],
       ),
     );
   }
@@ -125,43 +124,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget settingsTile(
       String title, Function() function, IconData icon, Color? color) {
-    return Container(
-      width: double.infinity.w,
-      height: 60,
-      decoration: const BoxDecoration(
-        color: Colors.transparent,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5),
-        child: Row(
-          children: [
-            Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.black.withOpacity(0.25),
+    return GestureDetector(
+      onTap: () {
+        function();
+      },
+      child: Container(
+        width: double.infinity.w,
+        height: 60,
+        decoration: const BoxDecoration(
+          color: Colors.transparent,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5),
+          child: Row(
+            children: [
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.black.withOpacity(0.25),
+                ),
+                child: Center(
+                    child: Icon(
+                  icon,
+                  color: color,
+                  size: 25,
+                )),
               ),
-              child: Center(
-                  child: Icon(
-                icon,
-                color: color,
-                size: 25,
-              )),
-            ),
-            Gap(10.w),
-            Text(title,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(fontSize: 17, color: color)),
-            const Spacer(),
-            const Icon(
-              Icons.arrow_forward_ios_rounded,
-              color: Colors.white,
-              size: 20,
-            )
-          ],
+              Gap(10.w),
+              Text(title,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(fontSize: 17, color: color)),
+              const Spacer(),
+              const Icon(
+                Icons.arrow_forward_ios_rounded,
+                color: Colors.white,
+                size: 20,
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -188,8 +192,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       settingsTile("My Cart", () {},
                           Icons.shopping_cart_rounded, Colors.white),
                       Gap(2.h),
-                      settingsTile("My Favorite", () {}, Icons.favorite_rounded,
-                          Colors.white),
+                      settingsTile("My Favorite", () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const FavoritesScreen(),
+                        ));
+                      }, Icons.favorite_rounded, Colors.white),
                       Gap(2.h),
                       settingsTile(
                           "Rate Application", () {}, Icons.star, Colors.white),

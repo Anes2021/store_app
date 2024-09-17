@@ -27,4 +27,3 @@ void setUp() {
 // final toast = locator<ToastsHelper>();
 final feedBack = locator<FeedBackController>();
 // final imagePicker = locator<ImagePickerHelper>();
-final prefrences = locator<SharedPrefrencesController>();

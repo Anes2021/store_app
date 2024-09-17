@@ -1,4 +1,4 @@
-// ignore_for_file: unused_element
+// ignore_for_file: unused_element, unnecessary_null_comparison
 
 import 'package:balagh/screens/admin/create_item_shop_screen.dart';
 import 'package:balagh/screens/cart_screen.dart';
@@ -7,8 +7,10 @@ import 'package:balagh/screens/item_shop_screen.dart';
 import 'package:balagh/screens/orders_screen.dart';
 import 'package:balagh/screens/profile_screen.dart';
 import 'package:balagh/src/core/app_color.dart';
+import 'package:balagh/src/models/category_model.dart';
 import 'package:balagh/src/models/shop_item_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_cloud_firestore/firebase_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -29,6 +31,8 @@ class _HomeScreenState extends State<HomeScreen> {
   TextEditingController searchController = TextEditingController();
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   late List<ShopItemModel> listOfItemsNEW = [];
+  late List<CategoryModel> listOfCategories = [];
+
   bool isItemLoading = true;
 
   // PersistentTabController for controlling the bottom navigation bar
@@ -58,9 +62,31 @@ class _HomeScreenState extends State<HomeScreen> {
         return ShopItemModel.fromJson(doc.data());
       }).toList();
     });
+    listOfCategories =
+        await firestore.collection("categories").get().then((snapshot) {
+      return snapshot.docs.map((doc) {
+        return CategoryModel.fromJson(doc.data());
+      }).toList();
+    });
     setState(() {
       isItemLoading = false;
     });
+  }
+
+  String _formatTitle(String title) {
+    // Split the title into words
+    List<String> words = title.split(' ');
+
+    // If the title has more than one word, return the first word
+    String formattedTitle = words.length > 1 ? words.first : title;
+
+    // If the title exceeds 14 characters, truncate it
+    if (formattedTitle.length > 11) {
+      formattedTitle =
+          '${formattedTitle.substring(0, 11)}…'; // Add ellipsis for truncation
+    }
+
+    return formattedTitle;
   }
 
   @override
@@ -73,6 +99,9 @@ class _HomeScreenState extends State<HomeScreen> {
         items: _navBarsItems(),
         confineToSafeArea: true,
         navBarHeight: 60,
+        onItemSelected: (d) {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        },
         backgroundColor:
             AppColors.backgroundColorTwo, // Nav bar background color
         handleAndroidBackButtonPress: true,
@@ -98,6 +127,8 @@ class _HomeScreenState extends State<HomeScreen> {
       const ProfileScreen(),
     ];
   }
+
+//
 
   // Build the bottom navigation items
   List<PersistentBottomNavBarItem> _navBarsItems() {
@@ -149,7 +180,9 @@ class _HomeScreenState extends State<HomeScreen> {
             Gap(40.h),
             _buildAppBar(),
             _buildSearchBar(),
+            Gap(10.h),
             _buildCategoryList(),
+            Gap(20.h),
             _buildNewProducts(),
           ],
         ),
@@ -274,40 +307,74 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildCategoryList() {
-    final List<Map<String, dynamic>> categories = [
-      {'icon': Icons.memory, 'label': 'Storage'},
-      {'icon': Icons.dns, 'label': 'Servers'},
-      {'icon': Icons.desktop_mac, 'label': 'Monitors'},
-      {'icon': Icons.devices_other, 'label': 'Accessories'},
-      {'icon': Icons.devices_other, 'label': 'Accessories'},
-      {'icon': Icons.devices_other, 'label': 'Accessories'},
-      {'icon': Icons.devices_other, 'label': 'Accessories'},
-    ];
-
-    return Padding(
-      padding: const EdgeInsets.only(right: 10, left: 10, bottom: 30, top: 10),
-      child: SizedBox(
-        height: 70,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: categories.length,
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: Container(
-                width: 70,
-                height: 80,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                      color: AppColors.backgroundColorGrey01, width: 1.5),
-                  color: AppColors.backgroundColorGrey03,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            );
-          },
-        ),
+    return CarouselSlider.builder(
+      options: CarouselOptions(
+        height: 110,
+        autoPlay: true,
+        autoPlayInterval: const Duration(seconds: 2),
+        enlargeCenterPage: true,
+        viewportFraction: 0.25,
+        enlargeFactor: 0.0,
       ),
+      itemCount: listOfCategories.length,
+      itemBuilder: (context, index, realIdx) {
+        return Stack(
+          alignment: Alignment.topCenter,
+          children: [
+            (isItemLoading == false || listOfCategories.isNotEmpty)
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 85,
+                        height: 85,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                              color: AppColors.backgroundColorGrey01,
+                              width: 1.5),
+                          color: AppColors.backgroundColorGrey03,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.network(
+                            listOfCategories[index].imageUrl.toString(),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      Gap(3.h),
+                      Expanded(
+                        child: Text(
+                          _formatTitle(listOfCategories[index].title),
+                          style: Theme.of(context).textTheme.bodySmall,
+                          textAlign: TextAlign.center, // Center align the text
+                        ),
+                      )
+                    ],
+                  )
+                : Container(
+                    width: 85,
+                    height: 85,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                          color: AppColors.backgroundColorGrey01, width: 1.5),
+                      color: AppColors.backgroundColorGrey03,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+            Container(
+              width: 85,
+              height: 85,
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.4),
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
