@@ -1,9 +1,12 @@
+// ignore_for_file: camel_case_types
+
 import 'dart:developer';
 
 import 'package:balagh/src/core/app_color.dart';
 import 'package:balagh/src/models/shop_item_model.dart';
 import 'package:balagh/src/presentation/widgets.dart';
 import 'package:balagh/src/services/shared_prefrences_service.dart';
+import 'package:cherry_toast/cherry_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
@@ -161,41 +164,8 @@ class _ItemShopScreenState extends State<ItemShopScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {},
-                    child: Container(
-                      height: 50.h,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.orange,
-                          width: 2.sp,
-                        ),
-                        borderRadius: BorderRadius.circular(10.sp),
-                        color: AppColors.backgroundColorOne,
-                      ),
-                      child: Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.shopping_cart_outlined,
-                              color: Colors.orange,
-                              size: 30,
-                            ),
-                            Gap(15.w),
-                            Text(
-                              "Add to Cart",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(fontSize: 18),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+                addToCartButton(
+                  id: widget.itemModel.itemId,
                 ),
                 Gap(10.w),
                 LikeButton(
@@ -237,10 +207,16 @@ class _ItemShopScreenState extends State<ItemShopScreen> {
                   ),
                 ],
               ),
-              const ItemShopComments(),
-              const ItemShopComments(),
-              const ItemShopComments(),
-              const ItemShopComments(),
+              Gap(10.h),
+              const Wrap(
+                runSpacing: 10,
+                children: [
+                  ItemShopComments(),
+                  ItemShopComments(),
+                  ItemShopComments(),
+                  ItemShopComments(),
+                ],
+              )
             ],
           ),
         )
@@ -249,10 +225,12 @@ class _ItemShopScreenState extends State<ItemShopScreen> {
   }
 
   Widget imagesPreview() {
-    return Container(
+    return SizedBox(
       width: double.infinity.w,
-      height: 250.h,
-      color: AppColors.backgroundColorGrey02,
+      child: Image.network(
+        widget.itemModel.imageUrl.toString(),
+        fit: BoxFit.fitWidth,
+      ),
     );
   }
 
@@ -274,20 +252,24 @@ class _ItemShopScreenState extends State<ItemShopScreen> {
             Gap(10.h),
             Row(
               children: [
-                Text(
-                  widget.itemModel.priceAfterDiscount.toString(),
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.red,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  "\$",
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.red,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold),
-                ),
+                (widget.itemModel.discount)
+                    ? Text(
+                        widget.itemModel.priceAfterDiscount.toString(),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            color: Colors.red,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold),
+                      )
+                    : Container(),
+                (widget.itemModel.discount)
+                    ? Text(
+                        "\$",
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            color: Colors.red,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold),
+                      )
+                    : Container(),
               ],
             ),
             Row(
@@ -295,14 +277,14 @@ class _ItemShopScreenState extends State<ItemShopScreen> {
                 Text(
                   widget.itemModel.price.toString(),
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: AppColors.backgroundColorGrey02,
+                        color: AppColors.backgroundColorGrey01,
                         fontSize: 40,
                       ),
                 ),
                 Text(
                   "\$",
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: AppColors.backgroundColorGrey02,
+                        color: AppColors.backgroundColorGrey01,
                         fontSize: 40,
                       ),
                 ),
@@ -334,6 +316,69 @@ class _ItemShopScreenState extends State<ItemShopScreen> {
                   fontWeight: FontWeight.bold),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class addToCartButton extends StatefulWidget {
+  const addToCartButton({
+    super.key,
+    required this.id,
+  });
+  final String id;
+  @override
+  State<addToCartButton> createState() => _addToCartButtonState();
+}
+
+class _addToCartButtonState extends State<addToCartButton> {
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          log(widget.id);
+          CherryToast.success(
+            description: Text(
+              "Item added to cart (go to the cart screen to modify the quantity).",
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(color: AppColors.backgroundColorGrey03),
+            ),
+          ).show(context);
+        },
+        child: Container(
+          height: 50.h,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.orange,
+              width: 2.sp,
+            ),
+            borderRadius: BorderRadius.circular(10.sp),
+            color: AppColors.backgroundColorOne,
+          ),
+          child: Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.shopping_cart_outlined,
+                  color: Colors.orange,
+                  size: 30,
+                ),
+                Gap(15.w),
+                Text(
+                  "Add to Cart",
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge
+                      ?.copyWith(fontSize: 18),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -376,12 +421,30 @@ class _LikeButtonState extends State<LikeButton> {
       setState(() {
         isLiked = !isLiked;
       });
+      CherryToast.success(
+        description: Text(
+          "Item removed from Favorites Screen",
+          style: Theme.of(context)
+              .textTheme
+              .titleMedium
+              ?.copyWith(color: AppColors.backgroundColorGrey03),
+        ),
+      ).show(context);
     } else {
       favoritesList.add(widget.id);
       await prefrences.writeFavorites(favoritesList);
       setState(() {
         isLiked = !isLiked;
       });
+      CherryToast.success(
+        description: Text(
+          "Item added to Favorites Screen",
+          style: Theme.of(context)
+              .textTheme
+              .titleMedium
+              ?.copyWith(color: AppColors.backgroundColorGrey03),
+        ),
+      ).show(context);
     }
   }
 
@@ -389,6 +452,7 @@ class _LikeButtonState extends State<LikeButton> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
+        log(isLiked.toString());
         clickedLike();
       },
       child: Container(
@@ -415,6 +479,57 @@ class _LikeButtonState extends State<LikeButton> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
+  void _showCustomBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(25.0),
+        ),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: Colors.blue[50],
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(25.0),
+            ),
+          ),
+          child: const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                leading: Icon(Icons.navigation, color: Colors.blue),
+                title: Text('Navigation'),
+              ),
+              ListTile(
+                leading: Icon(Icons.map, color: Colors.blue),
+                title: Text('Maps'),
+              ),
+              ListTile(
+                leading: Icon(Icons.directions_car, color: Colors.blue),
+                title: Text('Altitude'),
+              ),
+              ListTile(
+                leading: Icon(Icons.local_post_office, color: Colors.blue),
+                title: Text('Pincode'),
+              ),
+              ListTile(
+                leading: Icon(Icons.history, color: Colors.blue),
+                title: Text('Past Details'),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

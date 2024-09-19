@@ -378,69 +378,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget newProductsItem(String title, String description, int price,
-      bool discount, int beforePrice, ShopItemModel itemModel) {
-    return Stack(
-      children: [
-        GestureDetector(
-          onTap: () {
-            Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => ItemShopScreen(
-                itemModel: itemModel,
-              ),
-            ));
-          },
-          child: Container(
-            width: (MediaQuery.of(context).size.width - 20.w - 10.w) / 2,
-            height: 310.h,
-            decoration: BoxDecoration(
-              border:
-                  Border.all(color: AppColors.backgroundColorGrey01, width: 1),
-              color: AppColors.backgroundColorGrey03,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 140.h,
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10)),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: itemModel.imageUrl != null &&
-                            itemModel.imageUrl!.isNotEmpty
-                        ? CachedNetworkImage(
-                            imageUrl: itemModel.imageUrl!,
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) => const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                            errorWidget: (context, url, error) => const Center(
-                              child: Icon(
-                                Icons.error,
-                                color: Colors.red,
-                              ),
-                            ),
-                          )
-                        : Center(
-                            child: Text('No image available',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium)), // Display this when URL is null or empty
-                  ),
-                ),
-                Gap(5.h),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildNewProducts() {
     return Padding(
       padding: EdgeInsets.only(right: 10.w, left: 10.w),
@@ -558,6 +495,7 @@ class NewProductItem extends StatelessWidget {
   Widget _productImage(BuildContext context) {
     return Container(
       height: 140.h,
+      width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),

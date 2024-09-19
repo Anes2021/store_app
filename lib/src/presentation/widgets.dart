@@ -1,4 +1,5 @@
 import 'package:balagh/src/core/app_color.dart';
+import 'package:balagh/src/models/user_model.dart';
 import 'package:firebase_cloud_firestore/firebase_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -127,62 +128,71 @@ class TextFieldSearchModel extends StatelessWidget {
   }
 }
 
-class ItemShopComments extends StatelessWidget {
-  const ItemShopComments({super.key});
+class ItemShopComments extends StatefulWidget {
+  const ItemShopComments({super.key, this.userModel});
+
+  final UserModel? userModel;
 
   @override
+  State<ItemShopComments> createState() => _ItemShopCommentsState();
+}
+
+class _ItemShopCommentsState extends State<ItemShopComments> {
+  @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(10.sp),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Container(
-                height: 30,
-                width: 30,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5.sp),
-                    color: Colors.orange,
-                    border: Border.all(color: Colors.black, width: 1.5)),
-              ),
-              Gap(10.w),
-              Text("UserName", style: Theme.of(context).textTheme.bodyMedium),
-              const Spacer(),
-              Text("2024/09/10",
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: AppColors.backgroundColorGrey03,
-                      fontSize: 13,
-                      fontWeight: FontWeight.normal)),
-              const Spacer(),
-              Text("(5.0)",
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: AppColors.backgroundColorGrey03,
-                      fontSize: 11,
-                      fontWeight: FontWeight.normal)),
-              const Icon(
-                Icons.star_rate_rounded,
-                size: 20,
-                color: Colors.orange,
-              )
-            ],
-          ),
-          Gap(3.h),
-          Row(
-            children: [
-              Expanded(
-                child: Text("Comment Here  ",
+    return Container(
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          color: Colors.orange.withOpacity(0.1)),
+      child: Padding(
+        padding: EdgeInsets.all(10.sp),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Container(
+                  height: 30,
+                  width: 30,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5.sp),
+                      color: Colors.orange,
+                      border: Border.all(color: Colors.black, width: 1.5)),
+                ),
+                Gap(10.w),
+                Text("UserName", style: Theme.of(context).textTheme.bodyMedium),
+                const Spacer(),
+                Text("2024/09/10",
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         color: AppColors.backgroundColorGrey03,
-                        fontSize: 15,
+                        fontSize: 13,
                         fontWeight: FontWeight.normal)),
-              ),
-            ],
-          ),
-          Gap(10.h),
-          Container(
-              height: 1.h, width: 150, color: AppColors.backgroundColorGrey02),
-        ],
+                const Spacer(),
+                Text("(5.0)",
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: AppColors.backgroundColorGrey03,
+                        fontSize: 11,
+                        fontWeight: FontWeight.normal)),
+                const Icon(
+                  Icons.star_rate_rounded,
+                  size: 20,
+                  color: Colors.orange,
+                )
+              ],
+            ),
+            Gap(3.h),
+            Row(
+              children: [
+                Expanded(
+                  child: Text("Comment Here  ",
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: AppColors.backgroundColorGrey03,
+                          fontSize: 15,
+                          fontWeight: FontWeight.normal)),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

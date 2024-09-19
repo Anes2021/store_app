@@ -14,19 +14,21 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          appBar(),
-          Gap(20.h),
-          welcomeSign(),
-          Gap(10.h),
-          settingsTiles(),
-          Gap(10.h),
-          settingsTiles2(),
-          Gap(10.h),
-          contactUs()
-        ],
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            appBar(),
+            Gap(20.h),
+            welcomeSign(),
+            Gap(10.h),
+            settingsTiles(),
+            Gap(10.h),
+            settingsTiles2(),
+            Gap(10.h),
+            contactUs()
+          ],
+        ),
       ),
     );
   }
