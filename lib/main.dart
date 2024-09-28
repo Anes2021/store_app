@@ -1,4 +1,4 @@
-import 'package:balagh/screens/home_screen.dart';
+import 'package:balagh/screens/auth/signin_screen.dart';
 import 'package:balagh/src/core/app_color.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -81,7 +81,7 @@ class _DistributorState extends State<Distributor> {
           primarySwatch: Colors.orange,
           fontFamily: 'Roboto',
         ),
-        home: const HomeScreen(),
+        home: const SigninScreen(),
       ),
     );
   }

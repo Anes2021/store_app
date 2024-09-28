@@ -191,7 +191,7 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
   Widget textFields() {
     return Column(
       children: [
-        TextFieldModel(
+        CustomTextField(
           controller: titleController,
           hintText: "put title here",
           function: (String text) {

@@ -483,8 +483,8 @@ class _LikeButtonState extends State<LikeButton> {
   }
 }
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class bottomSheet extends StatelessWidget {
+  const bottomSheet({super.key});
 
   void _showCustomBottomSheet(BuildContext context) {
     showModalBottomSheet(
@@ -531,5 +531,11 @@ class HomePage extends StatelessWidget {
         );
       },
     );
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    throw UnimplementedError();
   }
 }

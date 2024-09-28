@@ -387,7 +387,7 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
   Widget textFields() {
     return Column(
       children: [
-        TextFieldModel(
+        CustomTextField(
           controller: titleController,
           hintText: "put title here",
           function: (String text) {
@@ -397,7 +397,7 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
           },
         ),
         Gap(10.h),
-        TextFieldModel(
+        CustomTextField(
           maxLines: 3,
           minLines: 3,
           textFieldHeight: 15,
@@ -440,7 +440,7 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: TextFieldModel(
+              child: CustomTextField(
                 keyboardType: TextInputType.number,
                 controller: priceController,
                 hintText: (isDiscounted == false) ? "Add Price" : "Old Price",
@@ -554,7 +554,7 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
             ? Row(
                 children: [
                   Expanded(
-                    child: TextFieldModel(
+                    child: CustomTextField(
                       keyboardType: TextInputType.number,
                       controller: oldpriceController,
                       hintText: "Price After Discounting",
@@ -589,7 +589,7 @@ class _CreateItemShopScreenState extends State<CreateItemShopScreen> {
                   SizedBox(
                     width: 65.w,
                     child: Center(
-                      child: TextFieldModel(
+                      child: CustomTextField(
                         function: (newPrice) {
                           setState(() {
                             discountPercantage;
